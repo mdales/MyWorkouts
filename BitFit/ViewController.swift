@@ -1,7 +1,7 @@
 //
 //  ViewController.swift
 //  BitFit
-//
+//x
 //  Created by Michael Dales on 19/05/2019.
 //  Copyright © 2019 Digital Flapjack Ltd. All rights reserved.
 //
@@ -16,6 +16,10 @@ class ViewController: UIViewController {
     @IBOutlet weak var toggleButton: UIButton!
     @IBOutlet weak var distanceLabel: UILabel!
     @IBOutlet weak var durationLabel: UILabel!
+    @IBOutlet weak var activityButton: UIButton!
+    
+    let splitDistance = 1609.34
+    var splits = [Date]()
     
     let syncQ = DispatchQueue(label: "workout")
     
@@ -29,8 +33,12 @@ class ViewController: UIViewController {
     var lastLocation: CLLocation?
     var distance: CLLocationDistance = 0.0
     
+    var activityType = HKWorkoutActivityType.running
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        synthesizer.delegate = self
         
         locationManager.delegate = self
         locationManager.pausesLocationUpdatesAutomatically = false
@@ -60,7 +68,20 @@ class ViewController: UIViewController {
             }
         }
     }
-
+    
+    @IBAction func changeActivity(_ sender: Any) {
+        
+        if activityType == .running {
+            activityType = .cycling
+            activityButton.setImage(UIImage(named:"Cycling"), for: .normal)
+            print("cycling!")
+        } else {
+            activityType = .running
+            activityButton.setImage(UIImage(named:"Running"), for: .normal)
+            print("running!")
+        }
+    }
+    
     @IBAction func toggleWorkout(_ sender: Any) {
         
         if workoutBuilder == nil {
@@ -92,7 +113,7 @@ class ViewController: UIViewController {
         assert(routeBuilder == nil)
         
         let config = HKWorkoutConfiguration()
-        config.activityType = .running
+        config.activityType = activityType
         config.locationType = .outdoor
         
         workoutBuilder = HKWorkoutBuilder(healthStore: healthStore,
@@ -122,6 +143,7 @@ class ViewController: UIViewController {
         
         
         toggleButton.setTitle("Stop", for: .normal)
+        activityButton.isEnabled = false
     }
     
     func stopWorkout() {
@@ -194,6 +216,7 @@ class ViewController: UIViewController {
             }
         }
         toggleButton.setTitle("Start", for: .normal)
+        activityButton.isEnabled = true
     }
 }
 
@@ -215,11 +238,14 @@ extension ViewController: CLLocationManagerDelegate {
             lastLocation = location
         }
         
-        if Int(distance) % 1610 == 0 {
+        if distance > (splitDistance * Double(splits.count + 1)) {
             
-            let miles = distance / 1609.34
+            let now = Date()
+            splits.append(now)
+            
+            let miles = distance / splitDistance
             let start = self.workoutBuilder!.startDate!
-            let duration = Date().timeIntervalSince(start)
+            let duration = now.timeIntervalSince(start)
             let minutes = Int(duration / 60.0)
             let seconds = Int(duration) - (minutes * 60)
             
@@ -227,10 +253,17 @@ extension ViewController: CLLocationManagerDelegate {
                 self.distanceLabel.text = String(format: "%.1f miles", miles)
                 self.durationLabel.text = String(format: "%d minutes and %d seconds", minutes, seconds)
                 
-                let part1 = AVSpeechUtterance(string: self.distanceLabel.text!)
+                let audioSession = AVAudioSession.sharedInstance()
+                do {
+                    try audioSession.setCategory(.playback, options: [.duckOthers, .interruptSpokenAudioAndMixWithOthers])
+                    try audioSession.setActive(true)
+                } catch {
+                    print("Failed to duck other sounds")
+                }
+                
+                
+                let part1 = AVSpeechUtterance(string: self.distanceLabel.text! + " " + self.durationLabel.text!)
                 self.synthesizer.speak(part1)
-                let part2 = AVSpeechUtterance(string: self.durationLabel.text!)
-                self.synthesizer.speak(part2)
             }
         }
         
@@ -241,6 +274,17 @@ extension ViewController: CLLocationManagerDelegate {
                 print("Failed to insert data")
             }
         }
+    }
+}
+
+
+extension ViewController: AVSpeechSynthesizerDelegate {
+    
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        guard !synthesizer.isSpeaking else { return }
+        
+        let audioSession = AVAudioSession.sharedInstance()
+        try? audioSession.setActive(false)
     }
     
 }
