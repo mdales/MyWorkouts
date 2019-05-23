@@ -11,7 +11,7 @@ import HealthKit
 import CoreLocation
 import AVKit
 
-class ViewController: UIViewController {
+class RecordWorkoutViewController: UIViewController {
 
     @IBOutlet weak var toggleButton: UIButton!
     @IBOutlet weak var distanceLabel: UILabel!
@@ -221,7 +221,7 @@ class ViewController: UIViewController {
 }
 
 
-extension ViewController: CLLocationManagerDelegate {
+extension RecordWorkoutViewController: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
@@ -278,7 +278,7 @@ extension ViewController: CLLocationManagerDelegate {
 }
 
 
-extension ViewController: AVSpeechSynthesizerDelegate {
+extension RecordWorkoutViewController: AVSpeechSynthesizerDelegate {
     
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
         guard !synthesizer.isSpeaking else { return }

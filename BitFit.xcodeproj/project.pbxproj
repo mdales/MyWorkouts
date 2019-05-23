@@ -7,8 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4C0161CE2296B36000A043A5 /* WorkoutHistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0161CD2296B36000A043A5 /* WorkoutHistoryViewController.swift */; };
 		4C0400AD2291B4FB00E2F5FA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0400AC2291B4FB00E2F5FA /* AppDelegate.swift */; };
-		4C0400AF2291B4FB00E2F5FA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0400AE2291B4FB00E2F5FA /* ViewController.swift */; };
+		4C0400AF2291B4FB00E2F5FA /* RecordWorkoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0400AE2291B4FB00E2F5FA /* RecordWorkoutViewController.swift */; };
 		4C0400B22291B4FB00E2F5FA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4C0400B02291B4FB00E2F5FA /* Main.storyboard */; };
 		4C0400B52291B4FB00E2F5FA /* BitFit.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4C0400B32291B4FB00E2F5FA /* BitFit.xcdatamodeld */; };
 		4C0400B72291B4FC00E2F5FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C0400B62291B4FC00E2F5FA /* Assets.xcassets */; };
@@ -36,9 +37,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4C0161CD2296B36000A043A5 /* WorkoutHistoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutHistoryViewController.swift; sourceTree = "<group>"; };
 		4C0400A92291B4FB00E2F5FA /* BitFit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BitFit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C0400AC2291B4FB00E2F5FA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		4C0400AE2291B4FB00E2F5FA /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		4C0400AE2291B4FB00E2F5FA /* RecordWorkoutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordWorkoutViewController.swift; sourceTree = "<group>"; };
 		4C0400B12291B4FB00E2F5FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		4C0400B42291B4FB00E2F5FA /* BitFit.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = BitFit.xcdatamodel; sourceTree = "<group>"; };
 		4C0400B62291B4FC00E2F5FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -106,7 +108,8 @@
 			children = (
 				4C0400DD2291B56500E2F5FA /* BitFit.entitlements */,
 				4C0400AC2291B4FB00E2F5FA /* AppDelegate.swift */,
-				4C0400AE2291B4FB00E2F5FA /* ViewController.swift */,
+				4C0400AE2291B4FB00E2F5FA /* RecordWorkoutViewController.swift */,
+				4C0161CD2296B36000A043A5 /* WorkoutHistoryViewController.swift */,
 				4C0400B02291B4FB00E2F5FA /* Main.storyboard */,
 				4C0400B62291B4FC00E2F5FA /* Assets.xcassets */,
 				4C0400B82291B4FC00E2F5FA /* LaunchScreen.storyboard */,
@@ -284,7 +287,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4C0400AF2291B4FB00E2F5FA /* ViewController.swift in Sources */,
+				4C0400AF2291B4FB00E2F5FA /* RecordWorkoutViewController.swift in Sources */,
+				4C0161CE2296B36000A043A5 /* WorkoutHistoryViewController.swift in Sources */,
 				4C0400B52291B4FB00E2F5FA /* BitFit.xcdatamodeld in Sources */,
 				4C0400AD2291B4FB00E2F5FA /* AppDelegate.swift in Sources */,
 			);
