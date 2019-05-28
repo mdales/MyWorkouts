@@ -8,15 +8,35 @@
 
 import UIKit
 import CoreData
+import HealthKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
+    let healthStore = HKHealthStore()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+
+        
+        let distanceType = HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)
+        
+        let healthKitTypesToWrite: Set<HKSampleType> = [distanceType!, HKObjectType.workoutType(), HKSeriesType.workoutRoute()]
+        
+        healthStore.requestAuthorization(toShare: healthKitTypesToWrite, read: healthKitTypesToWrite) { (success, error) in
+            
+            if let err = error {
+                print("Failed to auth health store: \(err)")
+                return
+            }
+            
+            if !success {
+                print("health store auth wasn't a success")
+                return
+            }
+        }
+        
         return true
     }
 

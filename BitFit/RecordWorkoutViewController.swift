@@ -11,12 +11,53 @@ import HealthKit
 import CoreLocation
 import AVKit
 
+extension HKWorkoutActivityType {
+    func String() -> String {
+        switch self {
+        case .running:
+            return "running"
+        case .walking:
+            return "walking"
+        case .cycling:
+            return "cycling"
+        case .wheelchairRunPace:
+            return "wheelchairRunPace"
+        case .wheelchairWalkPace:
+            return "wheelchairWalkPace"
+        default:
+            return "unknownWorkoutActivityType"
+        }
+    }
+    
+    func DistanceType() -> HKQuantityType {
+        switch self {
+        case .downhillSkiing:
+            return HKObjectType.quantityType(forIdentifier: .distanceDownhillSnowSports)!
+        case .cycling:
+            return HKObjectType.quantityType(forIdentifier: .distanceCycling)!
+        case .running, .walking, .crossCountrySkiing, .golf:
+            return HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!
+        case .wheelchairWalkPace, .wheelchairRunPace:
+            return HKObjectType.quantityType(forIdentifier: .distanceWheelchair)!
+        default:
+            fatalError()
+        }
+    }
+}
+
 class RecordWorkoutViewController: UIViewController {
 
     @IBOutlet weak var toggleButton: UIButton!
     @IBOutlet weak var distanceLabel: UILabel!
     @IBOutlet weak var durationLabel: UILabel!
     @IBOutlet weak var activityButton: UIButton!
+    @IBOutlet weak var splitsTableView: UITableView!
+    
+    let supportedWorkouts: [HKWorkoutActivityType] = [.walking,
+                                                      .running,
+                                                      .cycling,
+                                                      .wheelchairWalkPace,
+                                                      .wheelchairRunPace]
     
     let splitDistance = 1609.34
     var splits = [Date]()
@@ -24,7 +65,8 @@ class RecordWorkoutViewController: UIViewController {
     let syncQ = DispatchQueue(label: "workout")
     
     let synthesizer = AVSpeechSynthesizer()
-    let healthStore = HKHealthStore()
+    
+    var updateTimer: Timer? = nil
     
     let locationManager = CLLocationManager()
     var workoutBuilder: HKWorkoutBuilder?
@@ -33,7 +75,7 @@ class RecordWorkoutViewController: UIViewController {
     var lastLocation: CLLocation?
     var distance: CLLocationDistance = 0.0
     
-    var activityType = HKWorkoutActivityType.running
+    var activityTypeIndex = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,6 +86,11 @@ class RecordWorkoutViewController: UIViewController {
         locationManager.pausesLocationUpdatesAutomatically = false
         locationManager.allowsBackgroundLocationUpdates = true
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        
+        activityTypeIndex = UserDefaults.standard.integer(forKey: "LastActivityIndex")
+        
+        let activityType = supportedWorkouts[activityTypeIndex]
+        activityButton.setImage(UIImage(named:activityType.String()), for: .normal)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -51,35 +98,23 @@ class RecordWorkoutViewController: UIViewController {
         
         locationManager.requestAlwaysAuthorization()
         
-        let distanceType = HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)
-        
-        let healthKitTypesToWrite: Set<HKSampleType> = [distanceType!, HKObjectType.workoutType(), HKSeriesType.workoutRoute()]
-        
-        healthStore.requestAuthorization(toShare: healthKitTypesToWrite, read: nil) { (success, error) in
-            
-            if let err = error {
-                print("Failed to auth health store: \(err)")
-                return
-            }
-            
-            if !success {
-                print("health store auth wasn't a success")
-                return
-            }
+        let audioSession = AVAudioSession.sharedInstance()
+        do {
+            try audioSession.setCategory(.playback, options: [.duckOthers, .interruptSpokenAudioAndMixWithOthers])
+            //                        try audioSession.setActive(true)
+        } catch {
+            print("Failed to duck other sounds")
         }
+
     }
     
     @IBAction func changeActivity(_ sender: Any) {
         
-        if activityType == .running {
-            activityType = .cycling
-            activityButton.setImage(UIImage(named:"Cycling"), for: .normal)
-            print("cycling!")
-        } else {
-            activityType = .running
-            activityButton.setImage(UIImage(named:"Running"), for: .normal)
-            print("running!")
-        }
+        activityTypeIndex = (activityTypeIndex + 1) % supportedWorkouts.count
+        UserDefaults.standard.set(activityTypeIndex, forKey: "LastActivityIndex")
+        
+        let activityType = supportedWorkouts[activityTypeIndex]
+        activityButton.setImage(UIImage(named:activityType.String()), for: .normal)
     }
     
     @IBAction func toggleWorkout(_ sender: Any) {
@@ -111,12 +146,17 @@ class RecordWorkoutViewController: UIViewController {
         print("Starting workout")
         
         assert(routeBuilder == nil)
+        assert(updateTimer == nil)
         
         let config = HKWorkoutConfiguration()
+        
+        let activityType = supportedWorkouts[activityTypeIndex]
         config.activityType = activityType
         config.locationType = .outdoor
         
-        workoutBuilder = HKWorkoutBuilder(healthStore: healthStore,
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        workoutBuilder = HKWorkoutBuilder(healthStore: appDelegate.healthStore,
                                           configuration: config,
                                           device: nil)
         
@@ -133,10 +173,11 @@ class RecordWorkoutViewController: UIViewController {
             }
             
             HKSeriesType.workoutRoute()
-            self.routeBuilder = HKWorkoutRouteBuilder(healthStore: self.healthStore, device: nil)
+            self.routeBuilder = HKWorkoutRouteBuilder(healthStore: appDelegate.healthStore, device: nil)
             
             self.lastLocation = nil
             self.distance = 0.0
+            self.splits.removeAll()
             self.locationManager.startUpdatingLocation()
                                         
         })
@@ -144,11 +185,53 @@ class RecordWorkoutViewController: UIViewController {
         
         toggleButton.setTitle("Stop", for: .normal)
         activityButton.isEnabled = false
+        
+        updateTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { _ in
+            
+            let now = Date()
+            
+            let splitsUpdated = self.distance > (self.splitDistance * Double(self.splits.count + 1))
+            if splitsUpdated {
+                self.splits.append(now)
+            }
+            
+            let miles = self.distance / self.splitDistance
+            let start = self.workoutBuilder!.startDate!
+            let duration = now.timeIntervalSince(start)
+            let minutes = Int(duration / 60.0)
+            let seconds = Int(duration) - (minutes * 60)
+            
+            DispatchQueue.main.async {
+                self.distanceLabel.text = String(format: "%.1f miles", miles)
+                self.durationLabel.text = String(format: "%d minutes and %d seconds", minutes, seconds)
+                
+                if splitsUpdated {
+                    self.splitsTableView.reloadData()
+                    
+                    let part1 = AVSpeechUtterance(string: self.distanceLabel.text! + " " + self.durationLabel.text!)
+                    self.synthesizer.speak(part1)
+                }
+            }
+            
+            
+        })
     }
     
     func stopWorkout() {
         
+        dispatchPrecondition(condition: .onQueue(DispatchQueue.main))
+        
         print("Stopping workout")
+        
+        if let timer = updateTimer {
+            timer.invalidate()
+            updateTimer = nil
+        }
+        
+        let completePhrase = AVSpeechUtterance(string: "Workout completed")
+        synthesizer.speak(completePhrase)
+        
+        
         
         guard let workoutBuilder = self.workoutBuilder else {
             return
@@ -159,8 +242,9 @@ class RecordWorkoutViewController: UIViewController {
         let endDate = Date()
         
         let distanceQuantity = HKQuantity(unit: HKUnit.meter(), doubleValue: distance)
-        let distanceType = HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)
-        let distanceSample = HKQuantitySample(type: distanceType!, quantity: distanceQuantity,
+        
+        let activityType = supportedWorkouts[activityTypeIndex]
+        let distanceSample = HKQuantitySample(type: activityType.DistanceType(), quantity: distanceQuantity,
                                               start: workoutBuilder.startDate!, end: endDate)
         
         workoutBuilder.add([distanceSample]) { (success, error) in
@@ -238,35 +322,6 @@ extension RecordWorkoutViewController: CLLocationManagerDelegate {
             lastLocation = location
         }
         
-        if distance > (splitDistance * Double(splits.count + 1)) {
-            
-            let now = Date()
-            splits.append(now)
-            
-            let miles = distance / splitDistance
-            let start = self.workoutBuilder!.startDate!
-            let duration = now.timeIntervalSince(start)
-            let minutes = Int(duration / 60.0)
-            let seconds = Int(duration) - (minutes * 60)
-            
-            DispatchQueue.main.async {
-                self.distanceLabel.text = String(format: "%.1f miles", miles)
-                self.durationLabel.text = String(format: "%d minutes and %d seconds", minutes, seconds)
-                
-                let audioSession = AVAudioSession.sharedInstance()
-                do {
-                    try audioSession.setCategory(.playback, options: [.duckOthers, .interruptSpokenAudioAndMixWithOthers])
-                    try audioSession.setActive(true)
-                } catch {
-                    print("Failed to duck other sounds")
-                }
-                
-                
-                let part1 = AVSpeechUtterance(string: self.distanceLabel.text! + " " + self.durationLabel.text!)
-                self.synthesizer.speak(part1)
-            }
-        }
-        
         builder.insertRouteData(locations) { (success, error) in
             if let err = error {
                 print("Failed to insert data! \(err)")
@@ -279,12 +334,34 @@ extension RecordWorkoutViewController: CLLocationManagerDelegate {
 
 
 extension RecordWorkoutViewController: AVSpeechSynthesizerDelegate {
-    
+
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
         guard !synthesizer.isSpeaking else { return }
-        
+
         let audioSession = AVAudioSession.sharedInstance()
         try? audioSession.setActive(false)
+    }
+
+}
+
+extension RecordWorkoutViewController: UITableViewDelegate {
+}
+
+extension RecordWorkoutViewController: UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return splits.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "splitsReuseIdentifier", for: indexPath)
+        
+        let split = splits[indexPath.row]
+        
+        cell.textLabel?.text = "\(split)"
+        
+        return cell
     }
     
 }

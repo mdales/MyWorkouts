@@ -7,40 +7,73 @@
 //
 
 import UIKit
+import HealthKit
 
 class WorkoutHistoryViewController: UITableViewController {
 
+    var runningWorkoutList = [HKSample]()
+    var cyclingWorkoutList = [HKSample]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+//        [HKWorkoutActivityType.running, HKWorkoutActivityType.cycling].
+        
+        let workout = HKQuery.predicateForWorkouts(with: .running)
+        let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
+        
+        let query = HKSampleQuery(sampleType: HKWorkoutType.workoutType(),
+                                  predicate: workout,
+                                  limit: HKObjectQueryNoLimit,
+                                  sortDescriptors: [sort]) { (query, result, error) in
+            
+                                    if let err = error {
+                                        print("Failed query: \(err)")
+                                        return
+                                    }
+                                    
+                                    guard let samples = result else {
+                                        print("We got no samples!")
+                                        return
+                                    }
+                                    
+                                    self.runningWorkoutList = samples
+                                    
+                                    DispatchQueue.main.async {                                        
+                                        self.tableView.reloadData()
+                                    }
+        }
+        
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.healthStore.execute(query)
     }
 
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 0
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 0
+        
+        
+        return runningWorkoutList.count
     }
 
-    /*
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
 
-        // Configure the cell...
-
+        let workout = runningWorkoutList[indexPath.row]
+        
+        cell.textLabel?.text = "\(workout.startDate)"
+        
         return cell
     }
-    */
+    
 
     /*
     // Override to support conditional editing of the table view.
