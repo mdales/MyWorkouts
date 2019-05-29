@@ -10,6 +10,11 @@ import UIKit
 import CoreData
 import HealthKit
 
+enum DistanceUnits: String {
+    case Miles
+    case Kilometers
+}
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 

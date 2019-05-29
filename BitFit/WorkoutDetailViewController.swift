@@ -9,62 +9,106 @@
 import UIKit
 import HealthKit
 
-class WorkoutDetailViewController: UIViewController {
-
-    @IBOutlet weak var dateLabel: UILabel!
-    @IBOutlet weak var distanceLabel: UILabel!
-    @IBOutlet weak var energyLabel: UILabel!
-    @IBOutlet weak var durationLabel: UILabel!
+class WorkoutDetailViewController: UITableViewController {
     
     var workout: HKWorkout?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        tableView.reloadData()
+    }
+    
+    // MARK: - Table view data source
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        guard let workout = self.workout else {
+            return 0
+        }
+        
+        return workout.totalEnergyBurned != nil ? 4 : 3
+    }
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "detailReuseIdentifier", for: indexPath)
         
         guard let workout = self.workout else {
-            dateLabel.text = ""
-            distanceLabel.text = ""
-            energyLabel.text = ""
-            return
+            cell.textLabel?.text = ""
+            cell.detailTextLabel?.text = ""
+            return cell
         }
         
-        let formater = DateFormatter()
-        formater.dateStyle = .medium
-        formater.timeStyle = .short
-        dateLabel.text = formater.string(from: workout.startDate)
-        
-        let duration = workout.duration
-        let minutes = Int(duration / 60.0)
-        let seconds = Int(duration) - (minutes * 60)
-        durationLabel.text = "\(minutes) minutes and \(seconds) seconds"
-        
-        if let distanceQuantity = workout.totalDistance {
-            let distance = distanceQuantity.doubleValue(for: .mile())
-            distanceLabel.text = String(format: "%.2f miles", distance)
-        } else {
-            distanceLabel.text = "No distance recorded"
+        switch indexPath.row {
+        case 0:
+            cell.textLabel?.text = "Date"
+            
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            formatter.timeStyle = .short
+            cell.detailTextLabel?.text = formatter.string(from: workout.startDate)
+            
+        case 1:
+            cell.textLabel?.text = "Duration"
+            
+            let formatter = DateComponentsFormatter()
+            formatter.allowedUnits = [.hour, .minute, .second, .nanosecond]
+            formatter.unitsStyle = .abbreviated
+            cell.detailTextLabel?.text = formatter.string(from: workout.duration)
+            
+        case 2:
+            cell.textLabel?.text = "Distance"
+            
+            if let distanceQuantity = workout.totalDistance {
+                
+                var units = DistanceUnits.Miles
+                if let distanceUnits = UserDefaults.standard.string(forKey: "distance_units") {
+                    if let newUnits = DistanceUnits(rawValue: distanceUnits) {
+                        units = newUnits
+                    }
+                }
+                
+                switch units {
+                case .Kilometers:
+                    let distance = distanceQuantity.doubleValue(for: .meter())
+                    cell.detailTextLabel?.text = String(format: "%.2f km", distance / 1000.0)
+                case .Miles:
+                    let distance = distanceQuantity.doubleValue(for: .mile())
+                    cell.detailTextLabel?.text = String(format: "%.2f miles", distance)
+                }
+            } else {
+                cell.detailTextLabel?.text = "No distance recorded"
+            }
+        case 3:
+            cell.textLabel?.text = "Energy burned"
+            
+            if let energyQuantity = workout.totalEnergyBurned {
+                let energy = energyQuantity.doubleValue(for: .kilocalorie())
+                cell.detailTextLabel?.text = String(format: "%.2f kcal", energy)
+            } else {
+                cell.detailTextLabel?.text = "No energy recorded"
+            }
+            
+        default:
+            cell.textLabel?.text = ""
+            cell.detailTextLabel?.text = ""
         }
         
-        if let energyQuantity = workout.totalEnergyBurned {
-            let energy = energyQuantity.doubleValue(for: .kilocalorie())
-            energyLabel.text = String(format: "%.2f kcal", energy)
-        } else {
-            energyLabel.text = "No energy recorded"
-        }
+        
+        return cell
     }
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        switch section {
+        case 0:
+            return "General"
+        default:
+            return nil
+        }
     }
-    */
 }
