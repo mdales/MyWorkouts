@@ -26,7 +26,7 @@ class RecordWorkoutViewController: UIViewController {
     
     var activityTypeIndex = 0
     
-    var latestSplits = [Date]()
+    var latestSplits = [WorkoutSplit]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -93,7 +93,7 @@ class RecordWorkoutViewController: UIViewController {
         assert(workoutTracker == nil)
         assert(updateTimer == nil)
         
-        latestSplits = [Date]()
+        latestSplits = [WorkoutSplit]()
         splitsTableView.reloadData()
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -109,16 +109,14 @@ class RecordWorkoutViewController: UIViewController {
                                             self.latestSplits = splits
                                             self.splitsTableView.reloadData()
                                             
-                                            guard let workout = self.workoutTracker else {
+                                            if splits.count < 2 {
                                                 return
                                             }
                                             
                                             let split = splits[splits.count - 1]
-                                            var initialTime = workout.startDate!
-                                            if splits.count > 2 {
-                                                initialTime = splits[splits.count - 2]
-                                            }
-                                            let splitDuration = split.timeIntervalSince(initialTime)
+                                            let priorSplit = splits[splits.count - 2]
+                                            
+                                            let splitDuration = split.time.timeIntervalSince(priorSplit.time)
                                             
                                             let formatter = DateComponentsFormatter()
                                             formatter.allowedUnits = [.hour, .minute, .second]
@@ -239,7 +237,7 @@ extension RecordWorkoutViewController: UITableViewDelegate {
 extension RecordWorkoutViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return latestSplits.count
+        return latestSplits.count > 0 ? latestSplits.count - 1 : 0
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -254,25 +252,27 @@ extension RecordWorkoutViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "splitsReuseIdentifier", for: indexPath)
         
-        guard let workout = workoutTracker else {
+        if indexPath.row > latestSplits.count {
             return cell
         }
         
-        if indexPath.row >= latestSplits.count {
-            return cell
-        }
+        let split = latestSplits[indexPath.row + 1]
+        let priorSplit = latestSplits[indexPath.row]
         
-        let split = latestSplits[indexPath.row]
-        var initialTime = workout.startDate!
-        if indexPath.row > 0 {
-            initialTime = latestSplits[indexPath.row - 1]
-        }
-        let splitDuration = split.timeIntervalSince(initialTime)
+        let splitDuration = split.time.timeIntervalSince(priorSplit.time)
         
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.hour, .minute, .second, .nanosecond]
         formatter.unitsStyle = .abbreviated
         cell.textLabel?.text = formatter.string(from: splitDuration)
+        
+        let units = WorkoutTracker.getDistanceUnitSetting()
+        switch units {
+        case .Miles:
+            cell.detailTextLabel?.text = "\(indexPath.row) miles"
+        case .Kilometers:
+            cell.detailTextLabel?.text = "\(indexPath.row) km"
+        }
         
         return cell
     }
