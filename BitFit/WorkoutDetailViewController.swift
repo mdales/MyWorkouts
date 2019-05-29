@@ -64,16 +64,9 @@ class WorkoutDetailViewController: UITableViewController {
         case 2:
             cell.textLabel?.text = "Distance"
             
-            if let distanceQuantity = workout.totalDistance {
+            if let distanceQuantity = workout.totalDistance {                
                 
-                var units = DistanceUnits.Miles
-                if let distanceUnits = UserDefaults.standard.string(forKey: "distance_units") {
-                    if let newUnits = DistanceUnits(rawValue: distanceUnits) {
-                        units = newUnits
-                    }
-                }
-                
-                switch units {
+                switch WorkoutTracker.getDistanceUnitSetting() {
                 case .Kilometers:
                     let distance = distanceQuantity.doubleValue(for: .meter())
                     cell.detailTextLabel?.text = String(format: "%.2f km", distance / 1000.0)
