@@ -17,13 +17,10 @@ class WorkoutHistoryViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-//        [HKWorkoutActivityType.running, HKWorkoutActivityType.cycling].
-        
-        let workout = HKQuery.predicateForWorkouts(with: .running)
+        let sourcePredicate = HKQuery.predicateForObjects(from: HKSource.default())
         let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
-        
         let query = HKSampleQuery(sampleType: HKWorkoutType.workoutType(),
-                                  predicate: workout,
+                                  predicate: sourcePredicate,
                                   limit: HKObjectQueryNoLimit,
                                   sortDescriptors: [sort]) { (query, result, error) in
             
@@ -62,18 +59,52 @@ class WorkoutHistoryViewController: UITableViewController {
         
         return runningWorkoutList.count
     }
-
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
 
-        let workout = runningWorkoutList[indexPath.row]
+        let workoutSample = runningWorkoutList[indexPath.row]
+        guard let workout = workoutSample as? HKWorkout else {
+            return cell
+        }
         
-        cell.textLabel?.text = "\(workout.startDate)"
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        formatter.dateStyle = .medium
+        let formattedDate = formatter.string(from: workout.startDate)
+        cell.detailTextLabel?.text = formattedDate
+        
+        let activityType = workout.workoutActivityType
+        cell.imageView?.image = UIImage(named: activityType.String())
+        
+        var headline = ""
+        
+        if let distanceQuantity = workout.totalDistance {
+            let distance = distanceQuantity.doubleValue(for: .mile())
+            headline += String(format:"%.2f miles", distance)
+        } else {
+            headline += "No distance recorded"
+        }
+        
+        if let energyQuantity = workout.totalEnergyBurned {
+            let energy = energyQuantity.doubleValue(for: .kilocalorie())
+            headline += String(format: ", \(energy) kcal")
+        }
+        
+        cell.textLabel?.text = headline
         
         return cell
     }
     
+//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        let workoutSample = runningWorkoutList[indexPath.row]
+//        guard let workout = workoutSample as? HKWorkout else {
+//            return
+//        }
+//        
+//        
+//    }
+//    
 
     /*
     // Override to support conditional editing of the table view.
@@ -110,14 +141,27 @@ class WorkoutHistoryViewController: UITableViewController {
     }
     */
 
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+        
+        guard let destination = segue.destination as? WorkoutDetailViewController else {
+            return
+        }
+        guard let indexPath = tableView.indexPathForSelectedRow else {
+            return
+        }
+        
+        let workoutSample = runningWorkoutList[indexPath.row]
+        guard let workout = workoutSample as? HKWorkout else {
+            return
+        }
+        
+        destination.workout = workout
+        
     }
-    */
+    
 
 }

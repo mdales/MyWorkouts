@@ -202,13 +202,15 @@ class RecordWorkoutViewController: UIViewController {
             let seconds = Int(duration) - (minutes * 60)
             
             DispatchQueue.main.async {
-                self.distanceLabel.text = String(format: "%.1f miles", miles)
-                self.durationLabel.text = String(format: "%d minutes and %d seconds", minutes, seconds)
+                let distanceProse = String(format: "%.1f miles", miles)
+                let durationProse = String(format: "%d minutes and %d seconds", minutes, seconds)
+                
+                self.distanceLabel.text = distanceProse
+                self.durationLabel.text = durationProse
                 
                 if splitsUpdated {
                     self.splitsTableView.reloadData()
-                    
-                    let part1 = AVSpeechUtterance(string: self.distanceLabel.text! + " " + self.durationLabel.text!)
+                    let part1 = AVSpeechUtterance(string: "\(distanceProse) \(durationProse)")
                     self.synthesizer.speak(part1)
                 }
             }
@@ -227,11 +229,6 @@ class RecordWorkoutViewController: UIViewController {
             timer.invalidate()
             updateTimer = nil
         }
-        
-        let completePhrase = AVSpeechUtterance(string: "Workout completed")
-        synthesizer.speak(completePhrase)
-        
-        
         
         guard let workoutBuilder = self.workoutBuilder else {
             return
@@ -293,6 +290,23 @@ class RecordWorkoutViewController: UIViewController {
                     if let err = error {
                         print("Failed to finish route: \(err)")
                     }
+                    
+                    let duration = endDate.timeIntervalSince(finishedWorkout.startDate)
+                    let minutes = Int(duration / 60.0)
+                    let seconds = Int(duration) - (minutes * 60)
+                    var completionProse = "Workout completed. Time \(minutes) minutes and \(seconds) seconds. "
+                    
+                    if let distanceQuantity = finishedWorkout.totalDistance {
+                        let distance = distanceQuantity.doubleValue(for: .mile())
+                        let distanceProse = String(format: " %.2f miles", distance)
+                        completionProse += distanceProse
+                    }
+                        
+                    let completePhrase = AVSpeechUtterance(string: completionProse)
+                    DispatchQueue.main.async {
+                        self.synthesizer.speak(completePhrase)
+                    }
+                    
                 })
                 
                 self.workoutBuilder = nil
