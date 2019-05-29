@@ -71,6 +71,8 @@ class WorkoutTracker: NSObject {
     let splitDistance: Double
     let locationManager: CLLocationManager
     
+    let splitsUpdateCallback: (([Date]) -> Void)
+    
     // Should only be updated on syncQ
     var splits = [Date]()
     var workoutBuilder: HKWorkoutBuilder?
@@ -117,11 +119,17 @@ class WorkoutTracker: NSObject {
      * - Parameters:
      *   - activityType: The type of activity to be tracked by this object
      *   - splitDistance: When creating splits, what's the distance covered, in meters
+     *   - locationManaged: A setup and authorized location management object
      */
-    init(activityType: HKWorkoutActivityType, splitDistance: Double, locationManager: CLLocationManager) {
+    init(activityType: HKWorkoutActivityType,
+         splitDistance: Double,
+         locationManager: CLLocationManager,
+         splitsUpdateCallback: @escaping ([Date]) -> Void
+        ) {
         self.splitDistance = splitDistance
         self.activityType = activityType
         self.locationManager = locationManager
+        self.splitsUpdateCallback = splitsUpdateCallback
     }
     
     /**
@@ -296,6 +304,10 @@ extension WorkoutTracker: CLLocationManagerDelegate {
                     
                     if distance > (self.splitDistance * Double(self.splits.count + 1)) {
                         self.splits.append(Date())
+                        let s = self.splits
+                        DispatchQueue.global().async {
+                            self.splitsUpdateCallback(s)
+                        }
                     }
                     
                 }

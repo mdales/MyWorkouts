@@ -1,7 +1,7 @@
 //
 //  ViewController.swift
 //  BitFit
-//x
+//
 //  Created by Michael Dales on 19/05/2019.
 //  Copyright © 2019 Digital Flapjack Ltd. All rights reserved.
 //
@@ -25,6 +25,8 @@ class RecordWorkoutViewController: UIViewController {
     var workoutTracker: WorkoutTracker?
     
     var activityTypeIndex = 0
+    
+    var latestSplits = [Date]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -91,13 +93,44 @@ class RecordWorkoutViewController: UIViewController {
         assert(workoutTracker == nil)
         assert(updateTimer == nil)
         
+        latestSplits = [Date]()
+        splitsTableView.reloadData()
+        
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
         let activityType = WorkoutTracker.supportedWorkouts[activityTypeIndex]
         let splitDistance = WorkoutTracker.getDistanceUnitSetting() == .Miles ? 1609.34 : 1000.0
         let workout = WorkoutTracker(activityType: activityType,
                                      splitDistance: splitDistance,
-                                     locationManager: appDelegate.locationManager)
+                                     locationManager: appDelegate.locationManager,
+                                     splitsUpdateCallback: { splits in
+                                        DispatchQueue.main.async {
+                                            
+                                            self.latestSplits = splits
+                                            self.splitsTableView.reloadData()
+                                            
+                                            guard let workout = self.workoutTracker else {
+                                                return
+                                            }
+                                            
+                                            let split = splits[splits.count - 1]
+                                            var initialTime = workout.startDate!
+                                            if splits.count > 2 {
+                                                initialTime = splits[splits.count - 2]
+                                            }
+                                            let splitDuration = split.timeIntervalSince(initialTime)
+                                            
+                                            let formatter = DateComponentsFormatter()
+                                            formatter.allowedUnits = [.hour, .minute, .second]
+                                            formatter.unitsStyle = .full
+                                            
+                                            let phrase = AVSpeechUtterance(string: formatter.string(from: splitDuration)!)
+                                            
+                                            let audioSession = AVAudioSession.sharedInstance()
+                                            try? audioSession.setActive(true)
+                                            self.synthesizer.speak(phrase)
+                                        }
+        })
         workoutTracker = workout
         
         do {
@@ -206,10 +239,15 @@ extension RecordWorkoutViewController: UITableViewDelegate {
 extension RecordWorkoutViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if let workout = workoutTracker {
-            return workout.splitTimes.count
-        } else {
-            return 0
+        return latestSplits.count
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        switch section {
+        case 0:
+            return "Splits"
+        default:
+            return nil
         }
     }
     
@@ -220,15 +258,14 @@ extension RecordWorkoutViewController: UITableViewDataSource {
             return cell
         }
         
-        let splits = workout.splitTimes
-        if indexPath.row >= splits.count {
+        if indexPath.row >= latestSplits.count {
             return cell
         }
         
-        let split = splits[indexPath.row]
+        let split = latestSplits[indexPath.row]
         var initialTime = workout.startDate!
         if indexPath.row > 0 {
-            initialTime = splits[indexPath.row - 1]
+            initialTime = latestSplits[indexPath.row - 1]
         }
         let splitDuration = split.timeIntervalSince(initialTime)
         
