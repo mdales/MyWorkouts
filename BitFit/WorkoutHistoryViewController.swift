@@ -15,6 +15,17 @@ class WorkoutHistoryViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        let pink = UIColor(red: 255.0/255.0,
+                           green: 45.0/255.0,
+                           blue: 85.0/255.0,
+                           alpha: 1.0)
+        
+        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: pink]
+        self.navigationController?.navigationBar.tintColor = pink
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         loadWorkoutHistory()
     }
     

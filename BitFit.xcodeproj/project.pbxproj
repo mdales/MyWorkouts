@@ -20,6 +20,7 @@
 		4C072B68229E6E5A00C9C3E7 /* WorkoutDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C072B67229E6E5A00C9C3E7 /* WorkoutDetailViewController.swift */; };
 		4C072B6A229E99F700C9C3E7 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4C072B69229E99F700C9C3E7 /* Settings.bundle */; };
 		4C072B6C229EA22900C9C3E7 /* WorkoutTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C072B6B229EA22900C9C3E7 /* WorkoutTracker.swift */; };
+		4C072B6F229FDC9200C9C3E7 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C072B6E229FDC9200C9C3E7 /* MapKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +61,7 @@
 		4C072B67229E6E5A00C9C3E7 /* WorkoutDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailViewController.swift; sourceTree = "<group>"; };
 		4C072B69229E99F700C9C3E7 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		4C072B6B229EA22900C9C3E7 /* WorkoutTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTracker.swift; sourceTree = "<group>"; };
+		4C072B6E229FDC9200C9C3E7 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C072B6F229FDC9200C9C3E7 /* MapKit.framework in Frameworks */,
 				4C0400E02291B56500E2F5FA /* HealthKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -149,6 +152,7 @@
 		4C0400DE2291B56500E2F5FA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4C072B6E229FDC9200C9C3E7 /* MapKit.framework */,
 				4C0400DF2291B56500E2F5FA /* HealthKit.framework */,
 			);
 			name = Frameworks;
@@ -229,8 +233,11 @@
 							com.apple.HealthKit = {
 								enabled = 1;
 							};
-							com.apple.iCloud = {
+							com.apple.Maps.iOS = {
 								enabled = 1;
+							};
+							com.apple.iCloud = {
+								enabled = 0;
 							};
 						};
 					};
