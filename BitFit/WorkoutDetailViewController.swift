@@ -75,8 +75,9 @@ class RouteCell: UITableViewCell {
             DispatchQueue.main.async {
                 let locations2D = locations.map { return $0.coordinate }
                 let polyline = MKPolyline(coordinates: locations2D, count: locations.count)
-                self.routeMapView.centerCoordinate = locations2D[0]
                 self.routeMapView.addOverlay(polyline)
+                self.routeMapView.centerCoordinate = polyline.coordinate
+                self.routeMapView.setVisibleMapRect(polyline.boundingMapRect, animated: true)
             }
             
             if done {

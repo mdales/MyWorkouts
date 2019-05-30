@@ -104,9 +104,7 @@ class RecordWorkoutViewController: UIViewController {
                                      locationManager: appDelegate.locationManager,
                                      splitsUpdateCallback: { splits, final in
                                         DispatchQueue.main.async {
-                                            
-                                            print(String(format: "%@: %@", final ? "true" : "false", splits))
-                                            
+                                                                                        
                                             self.latestSplits = splits
                                             if self.latestSplits.count > 1 {
                                                 self.splitsTableView.insertRows(at: [IndexPath(row: 0, section: 1)], with: .top)
@@ -292,9 +290,16 @@ extension RecordWorkoutViewController: UITableViewDataSource {
         }
         
         if currentSection {
-            return "Current"
+            switch section {
+            case 0:
+                return "Current"
+            case 1:
+                return "Splits"
+            default:
+                return ""
+            }
         } else {
-            return latestSplits.count > 1 ? "Splits" : ""
+            return ""
         }
     }
     

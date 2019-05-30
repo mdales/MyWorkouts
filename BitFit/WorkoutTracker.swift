@@ -262,34 +262,12 @@ class WorkoutTracker: NSObject {
             workoutBuilder.add([distanceSample]) { (success, error) in
                 if let err = error {
                     print("Failed to add sample: \(err)")
-                    return
                 }
                 if !success {
                     print("adding sample wasn't a success")
-                    return
                 }
-            }
             
-            workoutBuilder.endCollection(withEnd: endDate, completion: { (success, error) in
-                dispatchPrecondition(condition: .notOnQueue(self.syncQ))
-                if error != nil {
-                    self.syncQ.sync {
-                        self.workoutBuilder = nil
-                        self.routeBuilder = nil
-                    }
-                    completion(error)
-                    return
-                }
-                if !success {
-                    self.syncQ.sync {
-                        self.workoutBuilder = nil
-                        self.routeBuilder = nil
-                    }
-                    completion(WorkoutTrackerError.ErrorEndingCollection)
-                    return
-                }
-                
-                workoutBuilder.finishWorkout(completion: { (workout, error) in
+                workoutBuilder.endCollection(withEnd: endDate, completion: { (success, error) in
                     dispatchPrecondition(condition: .notOnQueue(self.syncQ))
                     if error != nil {
                         self.syncQ.sync {
@@ -299,27 +277,47 @@ class WorkoutTracker: NSObject {
                         completion(error)
                         return
                     }
-                    guard let finishedWorkout = workout else {
+                    if !success {
                         self.syncQ.sync {
                             self.workoutBuilder = nil
                             self.routeBuilder = nil
                         }
-                        completion(WorkoutTrackerError.MissingWorkout)
+                        completion(WorkoutTrackerError.ErrorEndingCollection)
                         return
                     }
                     
-                    self.syncQ.sync {
-                        self.workoutBuilder = nil
-                        self.routeBuilder?.finishRoute(with: finishedWorkout, metadata: nil, completion: { (route, error) in
-                            dispatchPrecondition(condition: .notOnQueue(self.syncQ))
+                    workoutBuilder.finishWorkout(completion: { (workout, error) in
+                        dispatchPrecondition(condition: .notOnQueue(self.syncQ))
+                        if error != nil {
                             self.syncQ.sync {
+                                self.workoutBuilder = nil
                                 self.routeBuilder = nil
                             }
                             completion(error)
-                        })
-                    }
+                            return
+                        }
+                        guard let finishedWorkout = workout else {
+                            self.syncQ.sync {
+                                self.workoutBuilder = nil
+                                self.routeBuilder = nil
+                            }
+                            completion(WorkoutTrackerError.MissingWorkout)
+                            return
+                        }
+                        
+                        self.syncQ.sync {
+                            self.workoutBuilder = nil
+                            self.routeBuilder?.finishRoute(with: finishedWorkout, metadata: nil, completion: { (route, error) in
+                                dispatchPrecondition(condition: .notOnQueue(self.syncQ))
+                                self.syncQ.sync {
+                                    self.routeBuilder = nil
+                                }
+                                completion(error)
+                            })
+                        }
+                    })
                 })
-            })
+            }
         }
     }
 }

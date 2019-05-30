@@ -26,11 +26,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         locationManager.pausesLocationUpdatesAutomatically = false
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         
-        let distanceType = HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)
         
-        let healthKitTypesToWrite: Set<HKSampleType> = [distanceType!, HKObjectType.workoutType(), HKSeriesType.workoutRoute()]
+        var healthKitTypes: Set<HKSampleType> = [HKObjectType.workoutType(), HKSeriesType.workoutRoute()]
+        for activityType in WorkoutTracker.supportedWorkouts {
+            let distanceType = activityType.DistanceType()
+            healthKitTypes.insert(distanceType)
+        }
         
-        healthStore.requestAuthorization(toShare: healthKitTypesToWrite, read: healthKitTypesToWrite) { (success, error) in
+        healthStore.requestAuthorization(toShare: healthKitTypes, read: healthKitTypes) { (success, error) in
             
             if let err = error {
                 print("Failed to auth health store: \(err)")
