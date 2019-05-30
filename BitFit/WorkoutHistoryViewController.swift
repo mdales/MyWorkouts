@@ -11,19 +11,21 @@ import HealthKit
 
 class WorkoutHistoryViewController: UITableViewController {
 
-    var runningWorkoutList = [HKSample]()
-    var cyclingWorkoutList = [HKSample]()
+    var workoutList = [HKSample]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        loadWorkoutHistory()
+    }
+    
+    func loadWorkoutHistory() {
         let sourcePredicate = HKQuery.predicateForObjects(from: HKSource.default())
         let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
         let query = HKSampleQuery(sampleType: HKWorkoutType.workoutType(),
                                   predicate: sourcePredicate,
                                   limit: HKObjectQueryNoLimit,
                                   sortDescriptors: [sort]) { (query, result, error) in
-            
+                                    
                                     if let err = error {
                                         print("Failed query: \(err)")
                                         return
@@ -34,13 +36,12 @@ class WorkoutHistoryViewController: UITableViewController {
                                         return
                                     }
                                     
-                                    self.runningWorkoutList = samples
+                                    self.workoutList = samples
                                     
-                                    DispatchQueue.main.async {                                        
+                                    DispatchQueue.main.async {
                                         self.tableView.reloadData()
                                     }
         }
-        
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.healthStore.execute(query)
@@ -53,13 +54,13 @@ class WorkoutHistoryViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return runningWorkoutList.count
+        return workoutList.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
 
-        let workoutSample = runningWorkoutList[indexPath.row]
+        let workoutSample = workoutList[indexPath.row]
         guard let workout = workoutSample as? HKWorkout else {
             return cell
         }
@@ -92,35 +93,41 @@ class WorkoutHistoryViewController: UITableViewController {
         return cell
     }
     
-//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        let workoutSample = runningWorkoutList[indexPath.row]
-//        guard let workout = workoutSample as? HKWorkout else {
-//            return
-//        }
-//        
-//        
-//    }
-//    
-
-    /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
     }
-    */
 
-    /*
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // Delete the row from the data source
+            
+            let workout = workoutList[indexPath.row]
+            
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let healthStore = appDelegate.healthStore
+           
+            healthStore.delete(workout) { (success, error) in
+                if let err = error {
+                    print("Failed to delete things: \(err)")
+                    self.loadWorkoutHistory()
+                    return
+                }
+                
+                if !success {
+                    print("Failed to delete things but no error")
+                    self.loadWorkoutHistory()
+                    return
+                }
+            }
+            
+            // deleting is async, but the UI needs to do something now, so we remove the data from
+            // our model for now, and we'll fix consistency later
+            workoutList.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+        }
     }
-    */
 
     /*
     // Override to support rearranging the table view.
@@ -150,7 +157,7 @@ class WorkoutHistoryViewController: UITableViewController {
             return
         }
         
-        let workoutSample = runningWorkoutList[indexPath.row]
+        let workoutSample = workoutList[indexPath.row]
         guard let workout = workoutSample as? HKWorkout else {
             return
         }
