@@ -14,8 +14,6 @@ import os.log
 class RecordWorkoutViewController: UIViewController {
 
     @IBOutlet weak var toggleButton: UIButton!
-    @IBOutlet weak var distanceLabel: UILabel!
-    @IBOutlet weak var durationLabel: UILabel!
     @IBOutlet weak var activityButton: UIButton!
     @IBOutlet weak var splitsTableView: UITableView!
     
@@ -94,39 +92,58 @@ class RecordWorkoutViewController: UIViewController {
         assert(updateTimer == nil)
         
         latestSplits = [WorkoutSplit]()
-        splitsTableView.reloadData()
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
         let activityType = WorkoutTracker.supportedWorkouts[activityTypeIndex]
         let splitDistance = WorkoutTracker.getDistanceUnitSetting() == .Miles ? 1609.34 : 1000.0
         let workout = WorkoutTracker(activityType: activityType,
-                                     splitDistance: splitDistance,
+                                     splitDistance: splitDistance / 10,
                                      locationManager: appDelegate.locationManager,
-                                     splitsUpdateCallback: { splits in
+                                     splitsUpdateCallback: { splits, final in
                                         DispatchQueue.main.async {
                                             
+                                            print(String(format: "%@: %@", final ? "true" : "false", splits))
+                                            
                                             self.latestSplits = splits
-                                            self.splitsTableView.reloadData()
+                                            if self.latestSplits.count > 1 {
+                                                self.splitsTableView.insertRows(at: [IndexPath(row: 0, section: 1)], with: .top)
+                                            } else {
+                                                self.splitsTableView.reloadData()
+                                            }
                                             
                                             if splits.count < 2 {
                                                 return
                                             }
                                             
-                                            let split = splits[splits.count - 1]
-                                            let priorSplit = splits[splits.count - 2]
-                                            
-                                            let splitDuration = split.time.timeIntervalSince(priorSplit.time)
-                                            
+                                            let latestSplit = splits[splits.count - 1]
+                                            let priorSplit = splits[final ? 0 : splits.count - 2]
+
+                                            let splitDuration = latestSplit.time.timeIntervalSince(priorSplit.time)
+                                            let splitDistance = latestSplit.distance - priorSplit.distance
+
+                                            var phrase = final ? "Total " : ""
+
                                             let formatter = DateComponentsFormatter()
                                             formatter.allowedUnits = [.hour, .minute, .second]
                                             formatter.unitsStyle = .full
-                                            
-                                            let phrase = AVSpeechUtterance(string: formatter.string(from: splitDuration)!)
-                                            
+                                            let durationPhrase = formatter.string(from: splitDuration)!
+
+                                            let units = WorkoutTracker.getDistanceUnitSetting()
+                                            switch units {
+                                            case .Miles:
+                                                let distance = splitDistance / 1609.34
+                                                phrase = String(format: "%@ Distance %.2f miles. Time %@", phrase, distance, durationPhrase)
+                                            case .Kilometers:
+                                                let distance = splitDistance / 1000.0
+                                                phrase = String(format: "%@ Distance %.2f kilometers. Time %@", phrase, distance, durationPhrase)
+                                            }
+
+                                            let spokenPhrase = AVSpeechUtterance(string: phrase)
+
                                             let audioSession = AVAudioSession.sharedInstance()
                                             try? audioSession.setActive(true)
-                                            self.synthesizer.speak(phrase)
+                                            self.synthesizer.speak(spokenPhrase)
                                         }
         })
         workoutTracker = workout
@@ -141,34 +158,15 @@ class RecordWorkoutViewController: UIViewController {
                 DispatchQueue.main.async {
                     self.toggleButton.setTitle("Stop", for: .normal)
                     self.activityButton.isEnabled = false
+                    self.splitsTableView.reloadData()
                     
                     self.updateTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { _ in
                         
-                        guard let workout = self.workoutTracker else {
-                            return
-                        }
-                        
-                        let now = Date()
-                        
-                        let miles = workout.estimatedDistance / splitDistance
-                        let start = workout.startDate!
-                        let duration = now.timeIntervalSince(start)
-                        let minutes = Int(duration / 60.0)
-                        let seconds = Int(duration) - (minutes * 60)
-                        
                         DispatchQueue.main.async {
-                            let distanceProse = String(format: "%.1f miles", miles)
-                            let durationProse = String(format: "%d minutes and %d seconds", minutes, seconds)
-                            
-                            self.distanceLabel.text = distanceProse
-                            self.durationLabel.text = durationProse
-//
-//                            if splitsUpdated {
-//                                self.splitsTableView.reloadData()
-//                                let part1 = AVSpeechUtterance(string: "\(distanceProse) \(durationProse)")
-//                                self.synthesizer.speak(part1)
-//                            }
+                            let set = IndexSet([0])
+                            self.splitsTableView.reloadSections(set, with: .none)
                         }
+                        
                     })
                 }
             }
@@ -215,6 +213,7 @@ class RecordWorkoutViewController: UIViewController {
                 //self.synthesizer.speak(completePhrase)
                 self.toggleButton.setTitle("Start", for: .normal)
                 self.activityButton.isEnabled = true
+                self.splitsTableView.reloadData()
             }
         }
     }
@@ -236,45 +235,119 @@ extension RecordWorkoutViewController: UITableViewDelegate {
 
 extension RecordWorkoutViewController: UITableViewDataSource {
     
+    func numberOfSections(in tableView: UITableView) -> Int {
+        if let workout = workoutTracker {
+            if workout.isRunning {
+                return 2
+            }
+        }
+        return 1
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return latestSplits.count > 0 ? latestSplits.count - 1 : 0
+        
+        var currentSection = false
+        if let workout = workoutTracker {
+            if workout.isRunning {
+                if section == 0 {
+                    currentSection = true
+                }
+            }
+        }
+        
+        if currentSection {
+            return 1
+        } else {
+            return latestSplits.count > 0 ? latestSplits.count - 1 : 0
+        }
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        switch section {
-        case 0:
+        
+        var currentSection = false
+        if let workout = workoutTracker {
+            if workout.isRunning {
+                if section == 0 {
+                    currentSection = true
+                }
+            }
+        }
+        
+        if currentSection {
+            return "Current"
+        } else {
             return "Splits"
-        default:
-            return nil
         }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "splitsReuseIdentifier", for: indexPath)
         
-        if indexPath.row > latestSplits.count {
+        if latestSplits.count == 0 {
             return cell
         }
         
-        let split = latestSplits[indexPath.row + 1]
-        let priorSplit = latestSplits[indexPath.row]
-        
-        let splitDuration = split.time.timeIntervalSince(priorSplit.time)
-        
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.hour, .minute, .second, .nanosecond]
-        formatter.unitsStyle = .abbreviated
-        cell.textLabel?.text = formatter.string(from: splitDuration)
-        
-        let units = WorkoutTracker.getDistanceUnitSetting()
-        switch units {
-        case .Miles:
-            cell.detailTextLabel?.text = "\(indexPath.row) miles"
-        case .Kilometers:
-            cell.detailTextLabel?.text = "\(indexPath.row) km"
+        var currentSection = false
+        if let workout = workoutTracker {
+            if workout.isRunning {
+                if indexPath.section == 0 {
+                    currentSection = true
+                }
+            }
         }
         
-        return cell
+        if currentSection {
+            
+            guard let workout = workoutTracker else {
+                return cell
+            }
+            
+            let firstSplit = latestSplits[0]
+            
+            let splitDuration = Date().timeIntervalSince(firstSplit.time)
+            
+            let formatter = DateComponentsFormatter()
+            formatter.allowedUnits = [.hour, .minute, .second, .nanosecond]
+            formatter.unitsStyle = .abbreviated
+            cell.textLabel?.text = formatter.string(from: splitDuration)
+            
+            let units = WorkoutTracker.getDistanceUnitSetting()
+            switch units {
+            case .Miles:
+                let distance = workout.estimatedDistance / 1609.34
+                cell.detailTextLabel?.text = String(format: "%.2f miles", distance)
+            case .Kilometers:
+                let distance = workout.estimatedDistance / 1000.0
+                cell.detailTextLabel?.text = String(format: "%.2f km", distance)
+            }
+            
+            return cell
+        } else {
+            
+            let index = (latestSplits.count - 1) - indexPath.row
+        
+            let split = latestSplits[index]
+            let firstSplit = latestSplits[0]
+            
+            let splitDuration = split.time.timeIntervalSince(firstSplit.time)
+            
+            let formatter = DateComponentsFormatter()
+            formatter.allowedUnits = [.hour, .minute, .second, .nanosecond]
+            formatter.unitsStyle = .abbreviated
+            cell.textLabel?.text = formatter.string(from: splitDuration)
+            
+            let units = WorkoutTracker.getDistanceUnitSetting()
+            switch units {
+            case .Miles:
+                let distance = split.distance / 1609.34
+                cell.detailTextLabel?.text = String(format: "%.2f miles", distance)
+            case .Kilometers:
+                let distance = split.distance / 1000.0
+                cell.detailTextLabel?.text = String(format: "%.2f km", distance)
+            }
+            
+            return cell
+        }
     }
     
 }

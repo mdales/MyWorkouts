@@ -81,7 +81,7 @@ class WorkoutTracker: NSObject {
     let splitDistance: Double
     let locationManager: CLLocationManager
     
-    let splitsUpdateCallback: (([WorkoutSplit]) -> Void)
+    let splitsUpdateCallback: (([WorkoutSplit], Bool) -> Void)
     
     // Should only be updated on syncQ
     var splits = [WorkoutSplit]()
@@ -123,6 +123,17 @@ class WorkoutTracker: NSObject {
         }
     }
     
+    var isRunning: Bool {
+        get {
+            dispatchPrecondition(condition: .notOnQueue(syncQ))
+            var res = false
+            syncQ.sync {
+                res = workoutBuilder != nil
+            }
+            return res
+        }
+    }
+    
     /**
      * Create a new workout tracker.
      *
@@ -134,7 +145,7 @@ class WorkoutTracker: NSObject {
     init(activityType: HKWorkoutActivityType,
          splitDistance: Double,
          locationManager: CLLocationManager,
-         splitsUpdateCallback: @escaping ([WorkoutSplit]) -> Void
+         splitsUpdateCallback: @escaping ([WorkoutSplit], Bool) -> Void
         ) {
         self.splitDistance = splitDistance
         self.activityType = activityType
@@ -175,7 +186,8 @@ class WorkoutTracker: NSObject {
                                            configuration: config,
                                            device: nil)
             workoutBuilder = builder
-            builder.beginCollection(withStart: Date(), completion: { (success, error) in
+            let startDate = Date()
+            builder.beginCollection(withStart: startDate, completion: { (success, error) in
                 
                 dispatchPrecondition(condition: .notOnQueue(self.syncQ))
                 self.syncQ.sync {
@@ -199,6 +211,12 @@ class WorkoutTracker: NSObject {
                     self.routeBuilder = HKWorkoutRouteBuilder(healthStore: healthStore, device: nil)
                     
                     self.locationManager.startUpdatingLocation()
+                    
+                    self.splits.append(WorkoutSplit(time: startDate, distance: 0.0))
+                    let s = self.splits
+                    DispatchQueue.global().async {
+                        self.splitsUpdateCallback(s, false)
+                    }
                     
                     completion(nil)
                 }
@@ -232,7 +250,7 @@ class WorkoutTracker: NSObject {
             self.splits.append(WorkoutSplit(time: endDate, distance: distance))
             let s = self.splits
             DispatchQueue.global().async {
-                self.splitsUpdateCallback(s)
+                self.splitsUpdateCallback(s, true)
             }
             
             let distanceQuantity = HKQuantity(unit: HKUnit.meter(), doubleValue: distance)
@@ -319,11 +337,11 @@ extension WorkoutTracker: CLLocationManagerDelegate {
                 if let last = lastLocation {
                     distance += location.distance(from: last)
                     
-                    if distance > (self.splitDistance * Double(self.splits.count + 1)) {
+                    if distance > (self.splitDistance * Double(self.splits.count)) {
                         self.splits.append(WorkoutSplit(time: Date(), distance: distance))
                         let s = self.splits
                         DispatchQueue.global().async {
-                            self.splitsUpdateCallback(s)
+                            self.splitsUpdateCallback(s, false)
                         }
                     }
                     
