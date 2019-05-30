@@ -31,6 +31,8 @@ class RecordWorkoutViewController: UIViewController {
         
         synthesizer.delegate = self
         
+        splitsTableView.separatorStyle = .none
+        
         activityTypeIndex = UserDefaults.standard.integer(forKey: "LastActivityIndex")
         
         let activityType = WorkoutTracker.supportedWorkouts[activityTypeIndex]
@@ -231,6 +233,22 @@ extension RecordWorkoutViewController: AVSpeechSynthesizerDelegate {
 }
 
 extension RecordWorkoutViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.text = self.tableView(tableView, titleForHeaderInSection: section)
+        label.textColor = UIColor(red: 255.0/255.0,
+                                  green: 45.0/255.0,
+                                  blue: 85.0/255.0,
+                                  alpha: 1.0)
+        return label
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 22.0
+    }
+    
 }
 
 extension RecordWorkoutViewController: UITableViewDataSource {
@@ -276,7 +294,7 @@ extension RecordWorkoutViewController: UITableViewDataSource {
         if currentSection {
             return "Current"
         } else {
-            return "Splits"
+            return latestSplits.count > 1 ? "Splits" : ""
         }
     }
     

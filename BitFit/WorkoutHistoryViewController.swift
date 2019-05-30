@@ -9,6 +9,47 @@
 import UIKit
 import HealthKit
 
+
+class WorkoutHistoryCell: UITableViewCell {
+    
+    @IBOutlet weak var iconView: UIImageView!
+    @IBOutlet weak var distanceLabel: UILabel!
+    @IBOutlet weak var durationLabel: UILabel!
+    @IBOutlet weak var dateLabel: UILabel!
+    
+    func setWorkout(_ workout: HKWorkout) {
+        
+        
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        formatter.dateStyle = .medium
+        let formattedDate = formatter.string(from: workout.startDate)
+        dateLabel.text = formattedDate
+        
+        let activityType = workout.workoutActivityType
+        iconView.image = UIImage(named: activityType.String())
+        
+        if let distanceQuantity = workout.totalDistance {
+            let units = WorkoutTracker.getDistanceUnitSetting()
+            switch units {
+            case .Miles:
+                let distance = distanceQuantity.doubleValue(for: .mile())
+                distanceLabel.text = String(format:"%.2f miles", distance)
+            case .Kilometers:
+                let distance = distanceQuantity.doubleValue(for: .meter())
+                distanceLabel.text = String(format:"%.2f km", distance / 1000.0)
+            }
+        } else {
+            distanceLabel.text = "No distance recorded"
+        }
+        
+        let durationFormatter = DateComponentsFormatter()
+        durationFormatter.allowedUnits = [.hour, .minute, .second, .nanosecond]
+        durationFormatter.unitsStyle = .abbreviated
+        durationLabel.text = durationFormatter.string(from: workout.duration)
+    }
+}
+
 class WorkoutHistoryViewController: UITableViewController {
 
     var workoutList = [HKSample]()
@@ -69,37 +110,12 @@ class WorkoutHistoryViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath) as! WorkoutHistoryCell
 
         let workoutSample = workoutList[indexPath.row]
-        guard let workout = workoutSample as? HKWorkout else {
-            return cell
+        if let workout = workoutSample as? HKWorkout  {
+            cell.setWorkout(workout)
         }
-        
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        formatter.dateStyle = .medium
-        let formattedDate = formatter.string(from: workout.startDate)
-        cell.detailTextLabel?.text = formattedDate
-        
-        let activityType = workout.workoutActivityType
-        cell.imageView?.image = UIImage(named: activityType.String())
-        
-        var headline = ""
-        
-        if let distanceQuantity = workout.totalDistance {
-            let distance = distanceQuantity.doubleValue(for: .mile())
-            headline += String(format:"%.2f miles", distance)
-        } else {
-            headline += "No distance recorded"
-        }
-        
-        if let energyQuantity = workout.totalEnergyBurned {
-            let energy = energyQuantity.doubleValue(for: .kilocalorie())
-            headline += String(format: ", \(energy) kcal")
-        }
-        
-        cell.textLabel?.text = headline
         
         return cell
     }
@@ -140,20 +156,9 @@ class WorkoutHistoryViewController: UITableViewController {
         }
     }
 
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 114.0
     }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
 
     
     // MARK: - Navigation
