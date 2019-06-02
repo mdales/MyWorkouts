@@ -11,11 +11,16 @@ import HealthKit
 import AVKit
 import os.log
 
+func roundDoubleForDisplay(_ x: Double) -> Double {
+    return (x * 100.0).rounded() / 100.0
+}
+
 class RecordWorkoutViewController: UIViewController {
 
     @IBOutlet weak var toggleButton: UIButton!
     @IBOutlet weak var activityButton: UIButton!
     @IBOutlet weak var splitsTableView: UITableView!
+    @IBOutlet weak var gpsAccuracyImage: UIImageView!
     
     let synthesizer = AVSpeechSynthesizer()
     
@@ -37,7 +42,7 @@ class RecordWorkoutViewController: UIViewController {
         
         let activityType = WorkoutTracker.supportedWorkouts[activityTypeIndex]
         activityButton.setImage(UIImage(named:activityType.String()), for: .normal)
-    }
+    }    
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -100,52 +105,9 @@ class RecordWorkoutViewController: UIViewController {
         let activityType = WorkoutTracker.supportedWorkouts[activityTypeIndex]
         let splitDistance = WorkoutTracker.getDistanceUnitSetting() == .Miles ? 1609.34 : 1000.0
         let workout = WorkoutTracker(activityType: activityType,
-                                     splitDistance: splitDistance / 10,
+                                     splitDistance: splitDistance,
                                      locationManager: appDelegate.locationManager,
-                                     splitsUpdateCallback: { splits, final in
-                                        DispatchQueue.main.async {
-                                                                                        
-                                            self.latestSplits = splits
-                                            if self.latestSplits.count > 1 {
-                                                self.splitsTableView.insertRows(at: [IndexPath(row: 0, section: 1)], with: .top)
-                                            } else {
-                                                self.splitsTableView.reloadData()
-                                            }
-                                            
-                                            if splits.count < 2 {
-                                                return
-                                            }
-                                            
-                                            let latestSplit = splits[splits.count - 1]
-                                            let priorSplit = splits[final ? 0 : splits.count - 2]
-
-                                            let splitDuration = latestSplit.time.timeIntervalSince(priorSplit.time)
-                                            let splitDistance = latestSplit.distance - priorSplit.distance
-
-                                            var phrase = final ? "Total " : ""
-
-                                            let formatter = DateComponentsFormatter()
-                                            formatter.allowedUnits = [.hour, .minute, .second]
-                                            formatter.unitsStyle = .full
-                                            let durationPhrase = formatter.string(from: splitDuration)!
-
-                                            let units = WorkoutTracker.getDistanceUnitSetting()
-                                            switch units {
-                                            case .Miles:
-                                                let distance = splitDistance / 1609.34
-                                                phrase = String(format: "%@ Distance %.2f miles. Time %@", phrase, distance, durationPhrase)
-                                            case .Kilometers:
-                                                let distance = splitDistance / 1000.0
-                                                phrase = String(format: "%@ Distance %.2f kilometers. Time %@", phrase, distance, durationPhrase)
-                                            }
-
-                                            let spokenPhrase = AVSpeechUtterance(string: phrase)
-
-                                            let audioSession = AVAudioSession.sharedInstance()
-                                            try? audioSession.setActive(true)
-                                            self.synthesizer.speak(spokenPhrase)
-                                        }
-        })
+                                     delegate: self)
         workoutTracker = workout
         
         do {
@@ -217,6 +179,76 @@ class RecordWorkoutViewController: UIViewController {
             }
         }
     }
+}
+
+extension RecordWorkoutViewController: WorkoutTrackerDelegate {
+    
+    func stateUpdated(newState: WorkoutState) {
+        
+        DispatchQueue.main.async {
+            switch newState {
+            case .WaitingForGPS:
+                self.gpsAccuracyImage.isHidden = false
+            case .Started:
+                self.gpsAccuracyImage.isHidden = true
+                
+                let spokenPhrase = AVSpeechUtterance(string: "Go!")
+                let audioSession = AVAudioSession.sharedInstance()
+                try? audioSession.setActive(true)
+                self.synthesizer.speak(spokenPhrase)
+                
+            default:
+                self.gpsAccuracyImage.isHidden = true
+            }
+        }
+        
+    }
+    
+    func splitsUpdated(latestSplits: [WorkoutSplit], finalUpdate: Bool) {
+        DispatchQueue.main.async {
+            self.latestSplits = latestSplits
+            if self.latestSplits.count > 1 {
+                self.splitsTableView.insertRows(at: [IndexPath(row: 0, section: 1)], with: .top)
+            } else {
+                self.splitsTableView.reloadData()
+            }
+            
+            if latestSplits.count < 2 {
+                return
+            }
+            
+            let latestSplit = latestSplits[latestSplits.count - 1]
+            let priorSplit = latestSplits[finalUpdate ? 0 : latestSplits.count - 2]
+            let firstSplit = latestSplits[0]
+            
+            let splitDuration = latestSplit.time.timeIntervalSince(priorSplit.time)
+            let splitDistance = latestSplit.distance - firstSplit.distance
+            
+            var phrase = finalUpdate ? "Total " : ""
+            
+            let formatter = DateComponentsFormatter()
+            formatter.allowedUnits = [.hour, .minute, .second]
+            formatter.unitsStyle = .full
+            let durationPhrase = formatter.string(from: splitDuration)!
+            
+            let units = WorkoutTracker.getDistanceUnitSetting()
+            switch units {
+            case .Miles:
+                let distance = splitDistance / 1609.34
+                phrase = String(format: "%@ Distance %f miles. Time %@", phrase, roundDoubleForDisplay(distance), durationPhrase)
+            case .Kilometers:
+                let distance = splitDistance / 1000.0
+                phrase = String(format: "%@ Distance %.2f kilometers. Time %@", phrase, roundDoubleForDisplay(distance), durationPhrase)
+            }
+            
+            let spokenPhrase = AVSpeechUtterance(string: phrase)
+            
+            let audioSession = AVAudioSession.sharedInstance()
+            try? audioSession.setActive(true)
+            self.synthesizer.speak(spokenPhrase)
+        }
+    }
+
 }
 
 extension RecordWorkoutViewController: AVSpeechSynthesizerDelegate {

@@ -15,6 +15,15 @@ enum DistanceUnit: String {
     case Kilometers
 }
 
+enum WorkoutState {
+    case Before
+    case WaitingForLocationStream
+    case WaitingForGPS
+    case Started
+    case Paused // not yet implemented
+    case Stopped
+}
+
 extension HKWorkoutActivityType {
     func String() -> String {
         switch self {
@@ -67,6 +76,26 @@ struct WorkoutSplit {
     }
 }
 
+protocol WorkoutTrackerDelegate {
+    /**
+     * Lets the delegate know the workout state has changed, so i can update the UI appropriately.
+     *
+     * - Parameters:
+     *   - newState: The current state the workout is now in.
+     */
+    func stateUpdated(newState: WorkoutState)
+    
+    /**
+     * Provides updated split information to the UI.
+     *
+     * - Parameters:
+     *   - latestSplits: A copy of the most recent split data, usually provided as the split is
+     *                   passed.
+     *   - finalUpdate: If true, this will be the last split data for this workout.
+     */
+    func splitsUpdated(latestSplits: [WorkoutSplit], finalUpdate: Bool)
+}
+
 class WorkoutTracker: NSObject {
     
     static let supportedWorkouts: [HKWorkoutActivityType] = [.walking,
@@ -76,14 +105,16 @@ class WorkoutTracker: NSObject {
                                                              .wheelchairRunPace]
     
     let syncQ = DispatchQueue(label: "workout")
+    let delegateQ = DispatchQueue(label: "workout delegate")
     
     let activityType: HKWorkoutActivityType
     let splitDistance: Double
     let locationManager: CLLocationManager
     
-    let splitsUpdateCallback: (([WorkoutSplit], Bool) -> Void)
+    let delegate: WorkoutTrackerDelegate
     
     // Should only be updated on syncQ
+    var state = WorkoutState.Before
     var splits = [WorkoutSplit]()
     var workoutBuilder: HKWorkoutBuilder?
     var routeBuilder: HKWorkoutRouteBuilder?
@@ -145,12 +176,12 @@ class WorkoutTracker: NSObject {
     init(activityType: HKWorkoutActivityType,
          splitDistance: Double,
          locationManager: CLLocationManager,
-         splitsUpdateCallback: @escaping ([WorkoutSplit], Bool) -> Void
+         delegate: WorkoutTrackerDelegate
         ) {
         self.splitDistance = splitDistance
         self.activityType = activityType
         self.locationManager = locationManager
-        self.splitsUpdateCallback = splitsUpdateCallback
+        self.delegate = delegate
     }
     
     /**
@@ -166,10 +197,11 @@ class WorkoutTracker: NSObject {
         dispatchPrecondition(condition: .notOnQueue(syncQ))
         try syncQ.sync {
             
-            if workoutBuilder != nil {
+            if state != .Before {
                 throw WorkoutTrackerError.WorkoutAlreadyStarted
             }
             
+            assert(workoutBuilder == nil)
             assert(routeBuilder == nil)
             
             self.lastLocation = nil
@@ -207,6 +239,11 @@ class WorkoutTracker: NSObject {
                         }
                     }
                     
+                    self.state = .WaitingForLocationStream
+                    self.delegateQ.async {
+                        self.delegate.stateUpdated(newState: .WaitingForLocationStream)
+                    }
+                    
                     HKSeriesType.workoutRoute()
                     self.routeBuilder = HKWorkoutRouteBuilder(healthStore: healthStore, device: nil)
                     
@@ -214,8 +251,8 @@ class WorkoutTracker: NSObject {
                     
                     self.splits.append(WorkoutSplit(time: startDate, distance: 0.0))
                     let s = self.splits
-                    DispatchQueue.global().async {
-                        self.splitsUpdateCallback(s, false)
+                    self.delegateQ.async {
+                        self.delegate.splitsUpdated(latestSplits: s, finalUpdate: false)
                     }
                     
                     completion(nil)
@@ -249,8 +286,8 @@ class WorkoutTracker: NSObject {
             // Add one final split
             self.splits.append(WorkoutSplit(time: endDate, distance: distance))
             let s = self.splits
-            DispatchQueue.global().async {
-                self.splitsUpdateCallback(s, true)
+            self.delegateQ.async {
+                self.delegate.splitsUpdated(latestSplits: s, finalUpdate: true)
             }
             
             let distanceQuantity = HKQuantity(unit: HKUnit.meter(), doubleValue: distance)
@@ -300,6 +337,12 @@ class WorkoutTracker: NSObject {
                             self.syncQ.sync {
                                 self.workoutBuilder = nil
                                 self.routeBuilder = nil
+                                
+                                self.state = .Stopped
+                                self.delegateQ.async {
+                                    self.delegate.stateUpdated(newState: .Stopped)
+                                }
+                                
                             }
                             completion(WorkoutTrackerError.MissingWorkout)
                             return
@@ -327,31 +370,65 @@ extension WorkoutTracker: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
         syncQ.sync {
-            guard let builder = routeBuilder else {
-                return
-            }
             
-            for location in locations {
-                if let last = lastLocation {
-                    distance += location.distance(from: last)
-                    
-                    if distance > (self.splitDistance * Double(self.splits.count)) {
-                        self.splits.append(WorkoutSplit(time: Date(), distance: distance))
-                        let s = self.splits
-                        DispatchQueue.global().async {
-                            self.splitsUpdateCallback(s, false)
+            var filteredLocations = locations
+            
+            if state == .WaitingForGPS || state == .WaitingForLocationStream {
+                var remaining = [CLLocation]()
+                
+                for location in locations {
+                    switch state {
+                    case .WaitingForGPS, .WaitingForLocationStream:
+                        switch Int(location.horizontalAccuracy) {
+                        case 0...10:
+                            state = .Started
+                            delegateQ.async {
+                                self.delegate.stateUpdated(newState: .Started)
+                            }
+                            remaining.append(location)
+                        default:
+                            if state == .WaitingForLocationStream {
+                                state = .WaitingForGPS
+                                delegateQ.async {
+                                    self.delegate.stateUpdated(newState: .WaitingForGPS)
+                                }
+                            }
+                            break
                         }
+                    default:
+                        remaining.append(location)
                     }
-                    
                 }
-                lastLocation = location
+                filteredLocations = remaining
             }
             
-            builder.insertRouteData(locations) { (success, error) in
-                if let err = error {
-                    print("Failed to insert data! \(err)")
-                } else if !success {
-                    print("Failed to insert data")
+            if state == .Started {
+                guard let builder = routeBuilder else {
+                    return
+                }
+                
+                for location in filteredLocations {
+                    if let last = lastLocation {
+                        distance += location.distance(from: last)
+                        
+                        if distance > (self.splitDistance * Double(self.splits.count)) {
+                            self.splits.append(WorkoutSplit(time: Date(), distance: distance))
+                            let s = self.splits
+                            self.delegateQ.async {
+                                self.delegate.splitsUpdated(latestSplits: s, finalUpdate: false)
+                            }
+                        }
+                        
+                    }
+                    lastLocation = location
+                }
+                
+                builder.insertRouteData(locations) { (success, error) in
+                    if let err = error {
+                        print("Failed to insert data! \(err)")
+                    } else if !success {
+                        print("Failed to insert data")
+                    }
                 }
             }
         }

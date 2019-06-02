@@ -123,7 +123,7 @@
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="splitsReuseIdentifier" textLabel="r0X-te-Vvu" detailTextLabel="Zgm-tg-daP" style="IBUITableViewCellStyleValue1" id="et0-bJ-s40">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="splitsReuseIdentifier" textLabel="r0X-te-Vvu" detailTextLabel="Zgm-tg-daP" style="IBUITableViewCellStyleValue1" id="et0-bJ-s40">
                                         <rect key="frame" x="0.0" y="28" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="et0-bJ-s40" id="1q6-Yq-xMc">
@@ -173,6 +173,10 @@
                                     <action selector="toggleWorkout:" destination="BYZ-38-t0r" eventType="touchUpInside" id="AMs-QN-rYP"/>
                                 </connections>
                             </button>
+                            <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="noGPS" translatesAutoresizingMaskIntoConstraints="NO" id="MB9-DJ-V5D">
+                                <rect key="frame" x="315" y="44" width="44" height="44"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
@@ -182,6 +186,7 @@
                     </tabBarItem>
                     <connections>
                         <outlet property="activityButton" destination="J3C-ny-Vfa" id="F0M-H7-Fln"/>
+                        <outlet property="gpsAccuracyImage" destination="MB9-DJ-V5D" id="zSV-h3-h1i"/>
                         <outlet property="splitsTableView" destination="H8R-J8-4gD" id="8bz-gc-BYK"/>
                         <outlet property="toggleButton" destination="aki-hG-Oaw" id="UhM-Si-H74"/>
                     </connections>
@@ -254,6 +259,7 @@
     </scenes>
     <resources>
         <image name="archive" width="25" height="25"/>
+        <image name="noGPS" width="60" height="60"/>
         <image name="running" width="100" height="100"/>
         <image name="stopwatch" width="25" height="25"/>
     </resources>
