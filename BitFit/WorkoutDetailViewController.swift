@@ -13,10 +13,14 @@ import MapKit
 class RouteCell: UITableViewCell {
     
     @IBOutlet weak var routeMapView: MKMapView!
+    
+    var points = [CLLocationCoordinate2D]()
 
     func setWorkout(_ workout: HKWorkout) {
         
         routeMapView.delegate = self
+        
+        points = [CLLocationCoordinate2D]()
         
         let runningObjectQuery = HKQuery.predicateForObjects(from: workout)
         
@@ -72,17 +76,16 @@ class RouteCell: UITableViewCell {
                 fatalError("*** Invalid State: This can only fail if there was an error. ***")
             }
             
-            DispatchQueue.main.async {
-                let locations2D = locations.map { return $0.coordinate }
-                let polyline = MKPolyline(coordinates: locations2D, count: locations.count)
-                self.routeMapView.addOverlay(polyline)
-                self.routeMapView.centerCoordinate = polyline.coordinate
-                self.routeMapView.setVisibleMapRect(polyline.boundingMapRect, animated: true)
-            }
+            let locations2D = locations.map { return $0.coordinate }
+            self.points += locations2D
             
             if done {
-                // The query returned all the location data associated with the route.
-                // Do something with the complete data set.
+                let polyline = MKPolyline(coordinates: self.points, count: self.points.count)                
+                DispatchQueue.main.async {
+                    self.routeMapView.addOverlay(polyline)
+                    self.routeMapView.setVisibleMapRect(polyline.boundingMapRect, edgePadding: UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0), animated: false)
+                }
+                
             }
             
             // You can stop the query by calling:
