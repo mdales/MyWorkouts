@@ -11,9 +11,6 @@ import HealthKit
 import AVKit
 import os.log
 
-func roundDoubleForDisplay(_ x: Double) -> Double {
-    return (x * 100.0).rounded() / 100.0
-}
 
 class RecordWorkoutViewController: UIViewController {
 
@@ -196,7 +193,7 @@ extension RecordWorkoutViewController: WorkoutTrackerDelegate {
                 self.toggleButton.setTitle("Start", for: .normal)
                 self.activityButton.isEnabled = true
                 self.splitsTableView.reloadData()
-                                
+                
                 let spokenPhrase = AVSpeechUtterance(string: "Sorry, workout failed.")
                 let audioSession = AVAudioSession.sharedInstance()
                 try? audioSession.setActive(true)
@@ -235,14 +232,18 @@ extension RecordWorkoutViewController: WorkoutTrackerDelegate {
             formatter.unitsStyle = .full
             let durationPhrase = formatter.string(from: splitDuration)!
             
+            let numFormatter = NumberFormatter()
+            numFormatter.minimumFractionDigits = 0
+            numFormatter.maximumFractionDigits = 2
+            
             let units = WorkoutTracker.getDistanceUnitSetting()
             switch units {
             case .Miles:
                 let distance = splitDistance / 1609.34
-                phrase = String(format: "%@ Distance %f miles. Time %@", phrase, roundDoubleForDisplay(distance), durationPhrase)
+                phrase = String(format: "%@ Distance %@ miles. Time %@", phrase, numFormatter.string(from: NSNumber(floatLiteral: distance))!, durationPhrase)
             case .Kilometers:
                 let distance = splitDistance / 1000.0
-                phrase = String(format: "%@ Distance %.2f kilometers. Time %@", phrase, roundDoubleForDisplay(distance), durationPhrase)
+                phrase = String(format: "%@ Distance %@ kilometers. Time %@", phrase, numFormatter.string(from: NSNumber(floatLiteral: distance))!, durationPhrase)
             }
             
             let spokenPhrase = AVSpeechUtterance(string: phrase)

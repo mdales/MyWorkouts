@@ -80,7 +80,7 @@ class RouteCell: UITableViewCell {
             self.points += locations2D
             
             if done {
-                let polyline = MKPolyline(coordinates: self.points, count: self.points.count)                
+                let polyline = MKPolyline(coordinates: self.points, count: self.points.count)
                 DispatchQueue.main.async {
                     self.routeMapView.addOverlay(polyline)
                     self.routeMapView.setVisibleMapRect(polyline.boundingMapRect, edgePadding: UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0), animated: false)
@@ -140,7 +140,7 @@ class WorkoutDetailViewController: UITableViewController {
         
         switch section {
         case 0:
-            return workout.totalEnergyBurned != nil ? 4 : 3
+            return workout.totalEnergyBurned != nil ? 6 : 5
         case 1:
             return 1
         default:
@@ -195,6 +195,36 @@ class WorkoutDetailViewController: UITableViewController {
                     cell.detailTextLabel?.text = "No distance recorded"
                 }
             case 3:
+                cell.textLabel?.text = "Average speed"
+                
+                if let averageSpeedQuantity = workout.metadata?[HKMetadataKeyAverageSpeed] as? HKQuantity {
+                    
+                    let avgSpeed = averageSpeedQuantity.doubleValue(for: HKUnit.meter().unitDivided(by: HKUnit.second()))
+                    switch WorkoutTracker.getDistanceUnitSetting() {
+                    case .Kilometers:
+                        cell.detailTextLabel?.text = String(format: "%.2f km/h", avgSpeed * 3.6)
+                    case .Miles:
+                        cell.detailTextLabel?.text = String(format: "%.2f mph", avgSpeed * 2.236936)
+                    }
+                } else {
+                    cell.detailTextLabel?.text = "No average speed"
+                }
+            case 4:
+                cell.textLabel?.text = "Peak speed"
+                
+                if let peakSpeedQuantity = workout.metadata?[HKMetadataKeyMaximumSpeed] as? HKQuantity {
+                    
+                    let peakSpeed = peakSpeedQuantity.doubleValue(for: HKUnit.meter().unitDivided(by: HKUnit.second()))
+                    switch WorkoutTracker.getDistanceUnitSetting() {
+                    case .Kilometers:
+                        cell.detailTextLabel?.text = String(format: "%.2f km/h", peakSpeed * 3.6)
+                    case .Miles:
+                        cell.detailTextLabel?.text = String(format: "%.2f mph", peakSpeed * 2.236936)
+                    }
+                } else {
+                    cell.detailTextLabel?.text = "No peak speed"
+                }
+            case 5:
                 cell.textLabel?.text = "Energy burned"
                 
                 if let energyQuantity = workout.totalEnergyBurned {
