@@ -267,34 +267,24 @@ class WorkoutTracker: NSObject {
                                                   start: workoutBuilder.startDate!,
                                                   end: endDate)
             
-            workoutBuilder.add([distanceSample]) { (success, error) in
-                if let err = error {
-                    print("Failed to add sample: \(err)")
-                }
-                if !success {
-                    print("adding sample wasn't a success")
-                }
+            let peakSpeedQuantity = HKQuantity(unit: HKUnit.meter().unitDivided(by: HKUnit.second()), doubleValue: peakSpeed)
             
-                workoutBuilder.endCollection(withEnd: endDate, completion: { (success, error) in
-                    dispatchPrecondition(condition: .notOnQueue(self.syncQ))
-                    if error != nil {
-                        self.syncQ.sync {
-                            self.workoutBuilder = nil
-                            self.routeBuilder = nil
-                        }
-                        completion(error)
-                        return
+            let duration = endDate.timeIntervalSince(workoutBuilder.startDate!)
+            let averageSpeed = distance / duration
+            let averageSpeedQuantity = HKQuantity(unit: HKUnit.meter().unitDivided(by: HKUnit.second()), doubleValue: averageSpeed)
+
+            
+            workoutBuilder.addMetadata([HKMetadataKeyMaximumSpeed: peakSpeedQuantity, HKMetadataKeyAverageSpeed: averageSpeedQuantity], completion: { (success, error) in
+         
+                workoutBuilder.add([distanceSample]) { (success, error) in
+                    if let err = error {
+                        print("Failed to add sample: \(err)")
                     }
                     if !success {
-                        self.syncQ.sync {
-                            self.workoutBuilder = nil
-                            self.routeBuilder = nil
-                        }
-                        completion(WorkoutTrackerError.ErrorEndingCollection)
-                        return
+                        print("adding sample wasn't a success")
                     }
                     
-                    workoutBuilder.finishWorkout(completion: { (workout, error) in
+                    workoutBuilder.endCollection(withEnd: endDate, completion: { (success, error) in
                         dispatchPrecondition(condition: .notOnQueue(self.syncQ))
                         if error != nil {
                             self.syncQ.sync {
@@ -304,34 +294,54 @@ class WorkoutTracker: NSObject {
                             completion(error)
                             return
                         }
-                        guard let finishedWorkout = workout else {
+                        if !success {
                             self.syncQ.sync {
                                 self.workoutBuilder = nil
                                 self.routeBuilder = nil
-                                
-                                self.state = .Stopped
-                                self.delegateQ.async {
-                                    self.delegate.stateUpdated(newState: .Stopped)
-                                }
-                                
                             }
-                            completion(WorkoutTrackerError.MissingWorkout)
+                            completion(WorkoutTrackerError.ErrorEndingCollection)
                             return
                         }
-                        
-                        self.syncQ.sync {
-                            self.workoutBuilder = nil
-                            self.routeBuilder?.finishRoute(with: finishedWorkout, metadata: nil, completion: { (route, error) in
-                                dispatchPrecondition(condition: .notOnQueue(self.syncQ))
+                 
+                        workoutBuilder.finishWorkout(completion: { (workout, error) in
+                            dispatchPrecondition(condition: .notOnQueue(self.syncQ))
+                            if error != nil {
                                 self.syncQ.sync {
+                                    self.workoutBuilder = nil
                                     self.routeBuilder = nil
                                 }
                                 completion(error)
-                            })
-                        }
+                                return
+                            }
+                            guard let finishedWorkout = workout else {
+                                self.syncQ.sync {
+                                    self.workoutBuilder = nil
+                                    self.routeBuilder = nil
+                                    
+                                    self.state = .Stopped
+                                    self.delegateQ.async {
+                                        self.delegate.stateUpdated(newState: .Stopped)
+                                    }
+                                    
+                                }
+                                completion(WorkoutTrackerError.MissingWorkout)
+                                return
+                            }
+                            
+                            self.syncQ.sync {
+                                self.workoutBuilder = nil
+                                self.routeBuilder?.finishRoute(with: finishedWorkout, metadata: nil, completion: { (route, error) in
+                                    dispatchPrecondition(condition: .notOnQueue(self.syncQ))
+                                    self.syncQ.sync {
+                                        self.routeBuilder = nil
+                                    }
+                                    completion(error)
+                                })
+                            }
+                        })
                     })
-                })
-            }
+                }
+            })
         }
     }
 }
@@ -352,8 +362,24 @@ extension WorkoutTracker: CLLocationManagerDelegate {
                 var remaining = [CLLocation]()
                 
                 for location in locations {
+                    
+                    if lastLocation == nil {
+                        lastLocation = location
+                        continue
+                    }
+                    
+                    let newDistance = location.distance(from: lastLocation!)
+                    if newDistance > 10.0 {
+                        print("distance: \(newDistance)")
+                        lastLocation = location
+                        continue
+                    }
+                    
                     switch state {
                     case .WaitingForGPS, .WaitingForLocationStream:
+
+                        print("speed: \(location.speed)")
+                        
                         switch Int(location.horizontalAccuracy) {
                         case 0...10:
                             state = .Started
@@ -411,8 +437,11 @@ extension WorkoutTracker: CLLocationManagerDelegate {
                 }
                 
                 for location in filteredLocations {
+                    print("speed: \(location.speed)")
                     if let last = lastLocation {
-                        distance += location.distance(from: last)
+                        let newDistance = location.distance(from: last)
+                        print("distance: \(newDistance)")
+                        distance += newDistance
                         
                         if distance > (self.splitDistance * Double(self.splits.count)) {
                             self.splits.append(WorkoutSplit(time: Date(), distance: distance))
@@ -422,6 +451,12 @@ extension WorkoutTracker: CLLocationManagerDelegate {
                             }
                         }
                         
+                        let currentDuration = location.timestamp.timeIntervalSince(last.timestamp)
+                        let currentDistance = location.distance(from: last)
+                        self.currentSpeed = currentDistance / currentDuration
+                        if self.currentSpeed > self.peakSpeed {
+                            self.peakSpeed = self.currentSpeed
+                        }
                     }
                     lastLocation = location
                 }
