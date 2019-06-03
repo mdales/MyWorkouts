@@ -93,6 +93,8 @@ class RecordWorkoutViewController: UIViewController {
     
     func startWorkout() {
         
+        dispatchPrecondition(condition: .onQueue(DispatchQueue.main))
+        
         print("Starting workout")
         
         assert(workoutTracker == nil)
@@ -111,27 +113,20 @@ class RecordWorkoutViewController: UIViewController {
         workoutTracker = workout
         
         do {
-            try workout.startWorkout(healthStore: appDelegate.healthStore) { (error) in
-                if let err = error {
-                    print("Failed to start workout: \(err)")
-                    return
-                }
+            try workout.startWorkout(healthStore: appDelegate.healthStore)
+            
+            self.toggleButton.setTitle("Stop", for: .normal)
+            self.activityButton.isEnabled = false
+            self.splitsTableView.reloadData()
+            
+            self.updateTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { _ in
                 
                 DispatchQueue.main.async {
-                    self.toggleButton.setTitle("Stop", for: .normal)
-                    self.activityButton.isEnabled = false
-                    self.splitsTableView.reloadData()
-                    
-                    self.updateTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { _ in
-                        
-                        DispatchQueue.main.async {
-                            let set = IndexSet([0])
-                            self.splitsTableView.reloadSections(set, with: .none)
-                        }
-                        
-                    })
+                    let set = IndexSet([0])
+                    self.splitsTableView.reloadSections(set, with: .none)
                 }
-            }
+                
+            })
         } catch {
             print("Failed to start workout: \(error)")
         }
@@ -196,7 +191,16 @@ extension RecordWorkoutViewController: WorkoutTrackerDelegate {
                 let audioSession = AVAudioSession.sharedInstance()
                 try? audioSession.setActive(true)
                 self.synthesizer.speak(spokenPhrase)
-                
+            case .Failed:
+                self.workoutTracker = nil
+                self.toggleButton.setTitle("Start", for: .normal)
+                self.activityButton.isEnabled = true
+                self.splitsTableView.reloadData()
+                                
+                let spokenPhrase = AVSpeechUtterance(string: "Sorry, workout failed.")
+                let audioSession = AVAudioSession.sharedInstance()
+                try? audioSession.setActive(true)
+                self.synthesizer.speak(spokenPhrase)
             default:
                 self.gpsAccuracyImage.isHidden = true
             }

@@ -22,6 +22,7 @@ enum WorkoutState {
     case Started
     case Paused // not yet implemented
     case Stopped
+    case Failed
 }
 
 extension HKWorkoutActivityType {
@@ -116,6 +117,8 @@ class WorkoutTracker: NSObject {
     // Should only be updated on syncQ
     var state = WorkoutState.Before
     var splits = [WorkoutSplit]()
+    var peakSpeed = 0.0
+    var currentSpeed = 0.0
     var workoutBuilder: HKWorkoutBuilder?
     var routeBuilder: HKWorkoutRouteBuilder?
     var lastLocation: CLLocation?
@@ -189,11 +192,8 @@ class WorkoutTracker: NSObject {
      *
      * - Parameters:
      *   - healthStore: The health store to which to store the workout.
-     *   - completion: A callback to indicate that the workout has started, or if there is an error
-     *                 why it failed.
      */
-    func startWorkout(healthStore: HKHealthStore,
-                      completion: @escaping (Error?) -> Void) throws {
+    func startWorkout(healthStore: HKHealthStore) throws {
         dispatchPrecondition(condition: .notOnQueue(syncQ))
         try syncQ.sync {
             
@@ -218,46 +218,17 @@ class WorkoutTracker: NSObject {
                                            configuration: config,
                                            device: nil)
             workoutBuilder = builder
-            let startDate = Date()
-            builder.beginCollection(withStart: startDate, completion: { (success, error) in
-                
-                dispatchPrecondition(condition: .notOnQueue(self.syncQ))
-                self.syncQ.sync {
-                
-                    if error != nil {
-                        self.workoutBuilder = nil
-                        DispatchQueue.global().async {
-                            completion(error)
-                        }
-                        return
-                    }
-                    
-                    if !success {
-                        self.workoutBuilder = nil
-                        DispatchQueue.global().async {
-                            completion(WorkoutTrackerError.UnexplainedBeginingFailure)
-                        }
-                    }
-                    
-                    self.state = .WaitingForLocationStream
-                    self.delegateQ.async {
-                        self.delegate.stateUpdated(newState: .WaitingForLocationStream)
-                    }
-                    
-                    HKSeriesType.workoutRoute()
-                    self.routeBuilder = HKWorkoutRouteBuilder(healthStore: healthStore, device: nil)
-                    
-                    self.locationManager.startUpdatingLocation()
-                    
-                    self.splits.append(WorkoutSplit(time: startDate, distance: 0.0))
-                    let s = self.splits
-                    self.delegateQ.async {
-                        self.delegate.splitsUpdated(latestSplits: s, finalUpdate: false)
-                    }
-                    
-                    completion(nil)
-                }
-            })
+            
+            
+            self.state = .WaitingForLocationStream
+            self.delegateQ.async {
+                self.delegate.stateUpdated(newState: .WaitingForLocationStream)
+            }
+            
+            HKSeriesType.workoutRoute()
+            self.routeBuilder = HKWorkoutRouteBuilder(healthStore: healthStore, device: nil)
+            
+            self.locationManager.startUpdatingLocation()
         }
     }
     
@@ -371,6 +342,10 @@ extension WorkoutTracker: CLLocationManagerDelegate {
         
         syncQ.sync {
             
+            guard let builder = workoutBuilder else {
+                return
+            }
+            
             var filteredLocations = locations
             
             if state == .WaitingForGPS || state == .WaitingForLocationStream {
@@ -385,6 +360,34 @@ extension WorkoutTracker: CLLocationManagerDelegate {
                             delegateQ.async {
                                 self.delegate.stateUpdated(newState: .Started)
                             }
+                            
+                            let startDate = Date()
+                            builder.beginCollection(withStart: startDate, completion: { (success, error) in
+                                
+                                dispatchPrecondition(condition: .notOnQueue(self.syncQ))
+                                self.syncQ.sync {
+                                    
+                                    if error != nil {
+                                        self.locationManager.stopUpdatingLocation()
+                                        self.workoutBuilder = nil
+                                        self.state = .Failed
+                                        self.delegateQ.async {
+                                            self.delegate.stateUpdated(newState: .Failed)
+                                        }
+                                        return
+                                    }
+                                    
+                                    // we assume if there was no error everything is okay
+                                    assert(success)
+                                }
+                            })
+                            
+                            self.splits.append(WorkoutSplit(time: startDate, distance: 0.0))
+                            let s = self.splits
+                            self.delegateQ.async {
+                                self.delegate.splitsUpdated(latestSplits: s, finalUpdate: false)
+                            }
+                                                        
                             remaining.append(location)
                         default:
                             if state == .WaitingForLocationStream {
