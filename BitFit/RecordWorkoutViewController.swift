@@ -55,6 +55,12 @@ class RecordWorkoutViewController: UIViewController {
         }
     }
     
+    @IBAction func settings(_ sender: Any) {
+        UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!,
+                                  options: [:],
+                                  completionHandler: nil)
+    }
+    
     @IBAction func changeActivity(_ sender: Any) {
         
         activityTypeIndex = (activityTypeIndex + 1) % WorkoutTracker.supportedWorkouts.count
