@@ -81,6 +81,7 @@ class RecordWorkoutViewController: UIViewController {
         let indexPath = IndexPath(item: currentPage, section: 0)
         let scrollPosition: UICollectionView.ScrollPosition = .centeredHorizontally
         self.activityCollectionView.scrollToItem(at: indexPath, at: scrollPosition, animated: false)
+        lockedActivityImageView.image = UIImage(named: WorkoutTracker.supportedWorkouts[activityTypeIndex].String())
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -154,7 +155,6 @@ class RecordWorkoutViewController: UIViewController {
         do {
             try workout.startWorkout(healthStore: appDelegate.healthStore)
             
-            self.toggleButton.setTitle("Stop", for: .normal)
 //            self.activityButton.isEnabled = false
             self.lockedActivityImageView.isHidden = false
             self.activityCollectionView.isHidden = true
@@ -213,8 +213,13 @@ extension RecordWorkoutViewController: WorkoutTrackerDelegate {
             switch newState {
             case .WaitingForGPS:
                 self.gpsAccuracyImage.isHidden = false
+                self.activityLabel.text = "Waiting for GPS..."
+                self.toggleButton.setTitle("Cancel", for: .normal)
             case .Started:
                 self.gpsAccuracyImage.isHidden = true
+                let activityType = WorkoutTracker.supportedWorkouts[self.activityTypeIndex]
+                self.activityLabel.text = "Activity: \(activityType.DisplayString())"
+                self.toggleButton.setTitle("Stop", for: .normal)
                 
                 let spokenPhrase = AVSpeechUtterance(string: "Go!")
                 let audioSession = AVAudioSession.sharedInstance()
@@ -263,7 +268,8 @@ extension RecordWorkoutViewController: WorkoutTrackerDelegate {
             
             let splitDuration = latestSplit.time.timeIntervalSince(priorSplit.time)
             let splitDistance = latestSplit.distance - firstSplit.distance
-            let pace = splitDistance / splitDuration
+
+            let pace = (latestSplit.distance - priorSplit.distance) / splitDuration
             
             let formatter = DateComponentsFormatter()
             formatter.allowedUnits = [.hour, .minute, .second]
@@ -280,10 +286,10 @@ extension RecordWorkoutViewController: WorkoutTrackerDelegate {
                 let distance = splitDistance / 1609.34
                 
                 if announceDistance {
-                    phrase = String(format: "%@ Distance %@ miles. ", phrase, numFormatter.string(from: NSNumber(floatLiteral: distance))!)
+                    phrase = String(format: "%@ Distance %@ miles. --", phrase, numFormatter.string(from: NSNumber(floatLiteral: distance))!)
                 }
                 if announceTime {
-                    phrase = String(format: "%@ %@ time %@. ", phrase, finalUpdate ? "Total" : "", durationPhrase)
+                    phrase = String(format: "%@ %@ time %@. --", phrase, finalUpdate ? "Total" : "", durationPhrase)
                 }
                 if announcePace {
                     phrase = String(format: "%@ Pace %@ miles per hour. ", phrase, numFormatter.string(from: NSNumber(floatLiteral: pace * 2.236936))!)
@@ -293,10 +299,10 @@ extension RecordWorkoutViewController: WorkoutTrackerDelegate {
                 let distance = splitDistance / 1000.0
                 
                 if announceDistance {
-                    phrase = String(format: "%@ Distance %@ miles. ", phrase, numFormatter.string(from: NSNumber(floatLiteral: distance))!)
+                    phrase = String(format: "%@ Distance %@ miles. --", phrase, numFormatter.string(from: NSNumber(floatLiteral: distance))!)
                 }
                 if announceTime {
-                    phrase = String(format: "%@ %@ time %@. ", phrase, finalUpdate ? "Total" : "", durationPhrase)
+                    phrase = String(format: "%@ %@ time %@. --", phrase, finalUpdate ? "Total" : "", durationPhrase)
                 }
                 if announcePace {
                     phrase = String(format: "%@ Pace %@ kilometers per hour. ", phrase, numFormatter.string(from: NSNumber(floatLiteral: pace * 3.6))!)

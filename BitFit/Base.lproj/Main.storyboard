@@ -154,7 +154,7 @@
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="wHz-PU-NrN"/>
                                 </connections>
                             </tableView>
-                            <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="noGPS" translatesAutoresizingMaskIntoConstraints="NO" id="MB9-DJ-V5D">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="noGPS" translatesAutoresizingMaskIntoConstraints="NO" id="MB9-DJ-V5D">
                                 <rect key="frame" x="315" y="44" width="44" height="44"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>

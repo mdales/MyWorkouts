@@ -253,6 +253,13 @@ class WorkoutTracker: NSObject {
             }
             
             // XXXX if not start date we didn't get a GPS lock...
+            if state == .WaitingForLocationStream || state == .WaitingForGPS {
+                self.workoutBuilder = nil
+                routeBuilder = nil
+                state = .Stopped
+                completion(nil)
+                return
+            }
             
             let endDate = Date()
             
@@ -292,6 +299,7 @@ class WorkoutTracker: NSObject {
                             self.syncQ.sync {
                                 self.workoutBuilder = nil
                                 self.routeBuilder = nil
+                                self.state = .Stopped
                             }
                             completion(error)
                             return
@@ -300,6 +308,7 @@ class WorkoutTracker: NSObject {
                             self.syncQ.sync {
                                 self.workoutBuilder = nil
                                 self.routeBuilder = nil
+                                self.state = .Stopped
                             }
                             completion(WorkoutTrackerError.ErrorEndingCollection)
                             return
@@ -311,6 +320,7 @@ class WorkoutTracker: NSObject {
                                 self.syncQ.sync {
                                     self.workoutBuilder = nil
                                     self.routeBuilder = nil
+                                    self.state = .Stopped
                                 }
                                 completion(error)
                                 return
