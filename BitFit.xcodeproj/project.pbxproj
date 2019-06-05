@@ -20,6 +20,8 @@
 		4C072B68229E6E5A00C9C3E7 /* WorkoutDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C072B67229E6E5A00C9C3E7 /* WorkoutDetailViewController.swift */; };
 		4C072B6C229EA22900C9C3E7 /* WorkoutTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C072B6B229EA22900C9C3E7 /* WorkoutTracker.swift */; };
 		4C072B6F229FDC9200C9C3E7 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C072B6E229FDC9200C9C3E7 /* MapKit.framework */; };
+		4C7BE74F22A7F8A900383EA3 /* UPCarouselFlowLayout.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4C9BF7FD22A7E395008BF342 /* UPCarouselFlowLayout.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		4C7BE75122A800DF00383EA3 /* ThirdPartyLicenseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7BE75022A800DF00383EA3 /* ThirdPartyLicenseViewController.swift */; };
 		4C9BF80022A7E3B3008BF342 /* UPCarouselFlowLayout.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C9BF7FD22A7E395008BF342 /* UPCarouselFlowLayout.framework */; };
 		4C9BF80322A7ED42008BF342 /* WorkoutSelectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9BF80222A7ED42008BF342 /* WorkoutSelectionViewCell.swift */; };
 		4CADF11F22A67DC800AA31AA /* SettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CADF11E22A67DC800AA31AA /* SettingsTableViewController.swift */; };
@@ -64,6 +66,19 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		4C7BE74D22A7F89C00383EA3 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				4C7BE74F22A7F8A900383EA3 /* UPCarouselFlowLayout.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		4C0161CD2296B36000A043A5 /* WorkoutHistoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutHistoryViewController.swift; sourceTree = "<group>"; };
 		4C0400A92291B4FB00E2F5FA /* BitFit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BitFit.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -85,6 +100,7 @@
 		4C072B67229E6E5A00C9C3E7 /* WorkoutDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailViewController.swift; sourceTree = "<group>"; };
 		4C072B6B229EA22900C9C3E7 /* WorkoutTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTracker.swift; sourceTree = "<group>"; };
 		4C072B6E229FDC9200C9C3E7 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		4C7BE75022A800DF00383EA3 /* ThirdPartyLicenseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyLicenseViewController.swift; sourceTree = "<group>"; };
 		4C9BF7F522A7E394008BF342 /* UPCarouselFlowLayoutDemo.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = UPCarouselFlowLayoutDemo.xcodeproj; path = ThirdParty/UPCarouselFlowLayout/UPCarouselFlowLayoutDemo.xcodeproj; sourceTree = "<group>"; };
 		4C9BF80222A7ED42008BF342 /* WorkoutSelectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSelectionViewCell.swift; sourceTree = "<group>"; };
 		4CADF11E22A67DC800AA31AA /* SettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
@@ -151,12 +167,13 @@
 				4C072B67229E6E5A00C9C3E7 /* WorkoutDetailViewController.swift */,
 				4CADF11E22A67DC800AA31AA /* SettingsTableViewController.swift */,
 				4CADF12022A6883A00AA31AA /* DistanceEnumTableViewController.swift */,
+				4C9BF80222A7ED42008BF342 /* WorkoutSelectionViewCell.swift */,
+				4C7BE75022A800DF00383EA3 /* ThirdPartyLicenseViewController.swift */,
 				4C0400B02291B4FB00E2F5FA /* Main.storyboard */,
 				4C0400B62291B4FC00E2F5FA /* Assets.xcassets */,
 				4C0400B82291B4FC00E2F5FA /* LaunchScreen.storyboard */,
 				4C0400BB2291B4FC00E2F5FA /* Info.plist */,
 				4C0400B32291B4FB00E2F5FA /* BitFit.xcdatamodeld */,
-				4C9BF80222A7ED42008BF342 /* WorkoutSelectionViewCell.swift */,
 			);
 			path = BitFit;
 			sourceTree = "<group>";
@@ -208,6 +225,7 @@
 				4C0400A52291B4FA00E2F5FA /* Sources */,
 				4C0400A62291B4FA00E2F5FA /* Frameworks */,
 				4C0400A72291B4FA00E2F5FA /* Resources */,
+				4C7BE74D22A7F89C00383EA3 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -372,6 +390,7 @@
 				4C072B6C229EA22900C9C3E7 /* WorkoutTracker.swift in Sources */,
 				4C0161CE2296B36000A043A5 /* WorkoutHistoryViewController.swift in Sources */,
 				4C0400B52291B4FB00E2F5FA /* BitFit.xcdatamodeld in Sources */,
+				4C7BE75122A800DF00383EA3 /* ThirdPartyLicenseViewController.swift in Sources */,
 				4C0400AD2291B4FB00E2F5FA /* AppDelegate.swift in Sources */,
 				4C9BF80322A7ED42008BF342 /* WorkoutSelectionViewCell.swift in Sources */,
 				4CADF11F22A67DC800AA31AA /* SettingsTableViewController.swift in Sources */,

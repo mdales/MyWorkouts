@@ -23,15 +23,15 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSHealthShareUsageDescription</key>
-	<string>Health Privacy 2</string>
+	<string>Allow $(PRODUCT_NAME) to read recorded workout data in HealthKit. This is the only place workout data will be stored.</string>
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>Health Privacy 1</string>
+	<string>Allow $(PRODUCT_NAME) to record workout data to HealthKit. This is the only place workout data will be stored.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Privacy 1</string>
+	<string>Allow $(PRODUCT_NAME) access to location for tracking workout activity.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Privacy 2</string>
+	<string>Allow $(PRODUCT_NAME) access to location for tracking workout activity.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Privacy 3</string>
+	<string>Allow $(PRODUCT_NAME) access to location for tracking workout activity.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
