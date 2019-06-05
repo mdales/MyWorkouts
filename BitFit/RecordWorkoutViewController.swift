@@ -75,13 +75,19 @@ class RecordWorkoutViewController: UIViewController {
         
         splitsTableView.separatorStyle = .none
         
+        let layout = self.activityCollectionView.collectionViewLayout as! UPCarouselFlowLayout
+        layout.spacingMode = .fixed(spacing: 10.0)
+        
         activityTypeIndex = UserDefaults.standard.integer(forKey: "LastActivityIndex")
         currentPage = activityTypeIndex
+        
         
         let indexPath = IndexPath(item: currentPage, section: 0)
         let scrollPosition: UICollectionView.ScrollPosition = .centeredHorizontally
         self.activityCollectionView.scrollToItem(at: indexPath, at: scrollPosition, animated: false)
         lockedActivityImageView.image = UIImage(named: WorkoutTracker.supportedWorkouts[activityTypeIndex].String())
+        
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -211,7 +217,7 @@ extension RecordWorkoutViewController: WorkoutTrackerDelegate {
         
         DispatchQueue.main.async {
             switch newState {
-            case .WaitingForGPS:
+            case .WaitingForGPS, .WaitingForLocationStream:
                 self.gpsAccuracyImage.isHidden = false
                 self.activityLabel.text = "Waiting for GPS..."
                 self.toggleButton.setTitle("Cancel", for: .normal)
@@ -404,7 +410,7 @@ extension RecordWorkoutViewController: UITableViewDataSource {
                 return ""
             }
         } else {
-            return ""
+            return latestSplits.count > 1 ? "Splits" : ""
         }
     }
     
