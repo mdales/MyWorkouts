@@ -252,6 +252,8 @@ class WorkoutTracker: NSObject {
                 return
             }
             
+            // XXXX if not start date we didn't get a GPS lock...
+            
             let endDate = Date()
             
             // Add one final split

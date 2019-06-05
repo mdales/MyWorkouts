@@ -10,12 +10,33 @@ import UIKit
 import HealthKit
 import AVKit
 import os.log
+import UPCarouselFlowLayout
 
+extension HKWorkoutActivityType {
+    func DisplayString() -> String {
+        switch self {
+        case .running:
+            return "Running"
+        case .walking:
+            return "Walking"
+        case .cycling:
+            return "Cycling"
+        case .wheelchairRunPace:
+            return "Wheelchair, fast pace"
+        case .wheelchairWalkPace:
+            return "Wheelchair, medium pace"
+        default:
+            return "Unknown activity"
+        }
+    }
+}
 
 class RecordWorkoutViewController: UIViewController {
 
+    @IBOutlet weak var activityCollectionView: UICollectionView!
+    @IBOutlet weak var lockedActivityImageView: UIImageView!
+    @IBOutlet weak var activityLabel: UILabel!
     @IBOutlet weak var toggleButton: UIButton!
-    @IBOutlet weak var activityButton: UIButton!
     @IBOutlet weak var splitsTableView: UITableView!
     @IBOutlet weak var gpsAccuracyImage: UIImageView!
     
@@ -28,6 +49,25 @@ class RecordWorkoutViewController: UIViewController {
     
     var latestSplits = [WorkoutSplit]()
     
+    fileprivate var currentPage: Int = 0 {
+        didSet {
+            let activityType = WorkoutTracker.supportedWorkouts[self.currentPage]
+            self.activityLabel.text = "Activity: \(activityType.DisplayString())"
+        }
+    }
+    
+    fileprivate var pageSize: CGSize {
+        let layout = self.activityCollectionView.collectionViewLayout as! UPCarouselFlowLayout
+        var pageSize = layout.itemSize
+        if layout.scrollDirection == .horizontal {
+            pageSize.width += layout.minimumLineSpacing
+        } else {
+            pageSize.height += layout.minimumLineSpacing
+        }
+        return pageSize
+    }
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -36,10 +76,12 @@ class RecordWorkoutViewController: UIViewController {
         splitsTableView.separatorStyle = .none
         
         activityTypeIndex = UserDefaults.standard.integer(forKey: "LastActivityIndex")
+        currentPage = activityTypeIndex
         
-        let activityType = WorkoutTracker.supportedWorkouts[activityTypeIndex]
-        activityButton.setImage(UIImage(named:activityType.String()), for: .normal)
-    }    
+        let indexPath = IndexPath(item: currentPage, section: 0)
+        let scrollPosition: UICollectionView.ScrollPosition = .centeredHorizontally
+        self.activityCollectionView.scrollToItem(at: indexPath, at: scrollPosition, animated: false)
+    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -55,14 +97,14 @@ class RecordWorkoutViewController: UIViewController {
         }
     }
     
-    @IBAction func changeActivity(_ sender: Any) {
-        
-        activityTypeIndex = (activityTypeIndex + 1) % WorkoutTracker.supportedWorkouts.count
-        UserDefaults.standard.set(activityTypeIndex, forKey: "LastActivityIndex")
-        
-        let activityType = WorkoutTracker.supportedWorkouts[activityTypeIndex]
-        activityButton.setImage(UIImage(named:activityType.String()), for: .normal)
-    }
+//    @IBAction func changeActivity(_ sender: Any) {
+//
+//        activityTypeIndex = (activityTypeIndex + 1) % WorkoutTracker.supportedWorkouts.count
+//        UserDefaults.standard.set(activityTypeIndex, forKey: "LastActivityIndex")
+//
+//        let activityType = WorkoutTracker.supportedWorkouts[activityTypeIndex]
+//        activityButton.setImage(UIImage(named:activityType.String()), for: .normal)
+//    }
     
     @IBAction func toggleWorkout(_ sender: Any) {
         
@@ -113,7 +155,9 @@ class RecordWorkoutViewController: UIViewController {
             try workout.startWorkout(healthStore: appDelegate.healthStore)
             
             self.toggleButton.setTitle("Stop", for: .normal)
-            self.activityButton.isEnabled = false
+//            self.activityButton.isEnabled = false
+            self.lockedActivityImageView.isHidden = false
+            self.activityCollectionView.isHidden = true
             self.splitsTableView.reloadData()
             
             self.updateTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { _ in
@@ -152,7 +196,9 @@ class RecordWorkoutViewController: UIViewController {
             DispatchQueue.main.async {
                 self.workoutTracker = nil
                 self.toggleButton.setTitle("Start", for: .normal)
-                self.activityButton.isEnabled = true
+//                self.activityButton.isEnabled = true
+                self.activityCollectionView.isHidden = false
+                self.lockedActivityImageView.isHidden = true
                 self.splitsTableView.reloadData()
             }
         }
@@ -177,7 +223,9 @@ extension RecordWorkoutViewController: WorkoutTrackerDelegate {
             case .Failed:
                 self.workoutTracker = nil
                 self.toggleButton.setTitle("Start", for: .normal)
-                self.activityButton.isEnabled = true
+//                self.activityButton.isEnabled = true
+                self.activityCollectionView.isHidden = false
+                self.lockedActivityImageView.isHidden = true
                 self.splitsTableView.reloadData()
                 
                 let spokenPhrase = AVSpeechUtterance(string: "Sorry, workout failed.")
@@ -422,6 +470,51 @@ extension RecordWorkoutViewController: UITableViewDataSource {
             
             return cell
         }
+    }
+}
+
+//extension RecordWorkoutViewController: UICollectionViewDelegate {
+//
+//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+//        let activityType = WorkoutTracker.supportedWorkouts[indexPath.row]
+//
+//        let alert = UIAlertController(title: activityType.String(), message: nil, preferredStyle: .alert)
+//        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+//        present(alert, animated: true, completion: nil)
+//    }
+//
+//}
+
+extension RecordWorkoutViewController: UIScrollViewDelegate {
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        let layout = self.activityCollectionView.collectionViewLayout as! UPCarouselFlowLayout
+        let pageSide = (layout.scrollDirection == .horizontal) ? self.pageSize.width : self.pageSize.height
+        let offset = (layout.scrollDirection == .horizontal) ? scrollView.contentOffset.x : scrollView.contentOffset.y
+        currentPage = Int(floor((offset - pageSide / 2) / pageSide) + 1)
+        
+        activityTypeIndex = currentPage
+        UserDefaults.standard.set(activityTypeIndex, forKey: "LastActivityIndex")
+        let activityType = WorkoutTracker.supportedWorkouts[activityTypeIndex]
+        lockedActivityImageView.image = UIImage(named: activityType.String())
+    }
+}
+
+extension RecordWorkoutViewController: UICollectionViewDataSource {
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return WorkoutTracker.supportedWorkouts.count;
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "activitySelectorCell", for: indexPath) as! WorkoutSelectionViewCell
+        let activityType = WorkoutTracker.supportedWorkouts[indexPath.row]
+        cell.imageView.image = UIImage(named: activityType.String())
+        return cell
     }
     
 }

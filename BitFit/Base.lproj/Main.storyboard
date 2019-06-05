@@ -120,8 +120,8 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="H8R-J8-4gD">
-                                <rect key="frame" x="0.0" y="280" width="375" height="449"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" heightSizable="YES"/>
+                                <rect key="frame" x="0.0" y="372" width="375" height="357"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="splitsReuseIdentifier" textLabel="r0X-te-Vvu" detailTextLabel="Zgm-tg-daP" style="IBUITableViewCellStyleValue1" id="et0-bJ-s40">
@@ -154,17 +154,12 @@
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="wHz-PU-NrN"/>
                                 </connections>
                             </tableView>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J3C-ny-Vfa">
-                                <rect key="frame" x="139" y="83" width="96" height="96"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
-                                <color key="tintColor" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
-                                <state key="normal" title="Button" image="running"/>
-                                <connections>
-                                    <action selector="changeActivity:" destination="BYZ-38-t0r" eventType="touchUpInside" id="49J-Dk-WFO"/>
-                                </connections>
-                            </button>
+                            <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="noGPS" translatesAutoresizingMaskIntoConstraints="NO" id="MB9-DJ-V5D">
+                                <rect key="frame" x="315" y="44" width="44" height="44"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aki-hG-Oaw">
-                                <rect key="frame" x="16" y="216" width="343" height="30"/>
+                                <rect key="frame" x="16" y="301" width="343" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                 <state key="normal" title="Start">
@@ -174,9 +169,50 @@
                                     <action selector="toggleWorkout:" destination="BYZ-38-t0r" eventType="touchUpInside" id="AMs-QN-rYP"/>
                                 </connections>
                             </button>
-                            <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="noGPS" translatesAutoresizingMaskIntoConstraints="NO" id="MB9-DJ-V5D">
-                                <rect key="frame" x="315" y="44" width="44" height="44"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="v4R-WX-QlH">
+                                <rect key="frame" x="16" y="77" width="343" height="157"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="oSG-Lw-Llh" customClass="UPCarouselFlowLayout" customModule="UPCarouselFlowLayout">
+                                    <size key="itemSize" width="152" height="152"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="activitySelectorCell" id="Syw-KD-sjt" customClass="WorkoutSelectionViewCell" customModule="BitFit" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="2.6666666666666665" width="152" height="152"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
+                                            <rect key="frame" x="0.0" y="0.0" width="152" height="152"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iC3-GM-yPn">
+                                                    <rect key="frame" x="0.0" y="0.0" width="152" height="152"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                </imageView>
+                                            </subviews>
+                                        </view>
+                                        <connections>
+                                            <outlet property="imageView" destination="iC3-GM-yPn" id="WS2-XQ-xNL"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                </cells>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="IYp-fZ-YdD"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="rbg-s0-VhA"/>
+                                </connections>
+                            </collectionView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="q1J-oW-cTT">
+                                <rect key="frame" x="16" y="242" width="343" height="21"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" name="systemPinkColor" catalog="System" colorSpace="catalog"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rau-be-A50">
+                                <rect key="frame" x="111" y="79" width="152" height="152"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -186,8 +222,10 @@
                         <color key="badgeColor" name="systemPinkColor" catalog="System" colorSpace="catalog"/>
                     </tabBarItem>
                     <connections>
-                        <outlet property="activityButton" destination="J3C-ny-Vfa" id="F0M-H7-Fln"/>
+                        <outlet property="activityCollectionView" destination="v4R-WX-QlH" id="dAM-Nk-Pzi"/>
+                        <outlet property="activityLabel" destination="q1J-oW-cTT" id="wGQ-6j-MJ6"/>
                         <outlet property="gpsAccuracyImage" destination="MB9-DJ-V5D" id="zSV-h3-h1i"/>
+                        <outlet property="lockedActivityImageView" destination="Rau-be-A50" id="h9N-BE-a87"/>
                         <outlet property="splitsTableView" destination="H8R-J8-4gD" id="8bz-gc-BYK"/>
                         <outlet property="toggleButton" destination="aki-hG-Oaw" id="UhM-Si-H74"/>
                     </connections>
@@ -510,7 +548,6 @@
     <resources>
         <image name="archive" width="25" height="25"/>
         <image name="noGPS" width="60" height="60"/>
-        <image name="running" width="100" height="100"/>
         <image name="settings" width="25" height="25"/>
         <image name="stopwatch" width="25" height="25"/>
     </resources>

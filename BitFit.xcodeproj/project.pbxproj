@@ -20,6 +20,8 @@
 		4C072B68229E6E5A00C9C3E7 /* WorkoutDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C072B67229E6E5A00C9C3E7 /* WorkoutDetailViewController.swift */; };
 		4C072B6C229EA22900C9C3E7 /* WorkoutTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C072B6B229EA22900C9C3E7 /* WorkoutTracker.swift */; };
 		4C072B6F229FDC9200C9C3E7 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C072B6E229FDC9200C9C3E7 /* MapKit.framework */; };
+		4C9BF80022A7E3B3008BF342 /* UPCarouselFlowLayout.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C9BF7FD22A7E395008BF342 /* UPCarouselFlowLayout.framework */; };
+		4C9BF80322A7ED42008BF342 /* WorkoutSelectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9BF80222A7ED42008BF342 /* WorkoutSelectionViewCell.swift */; };
 		4CADF11F22A67DC800AA31AA /* SettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CADF11E22A67DC800AA31AA /* SettingsTableViewController.swift */; };
 		4CADF12122A6883A00AA31AA /* DistanceEnumTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CADF12022A6883A00AA31AA /* DistanceEnumTableViewController.swift */; };
 /* End PBXBuildFile section */
@@ -38,6 +40,27 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4C0400A82291B4FA00E2F5FA;
 			remoteInfo = BitFit;
+		};
+		4C9BF7FA22A7E395008BF342 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4C9BF7F522A7E394008BF342 /* UPCarouselFlowLayoutDemo.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 01D3876B1D1C4B9D00CE4E1F;
+			remoteInfo = UPCarouselFlowLayoutDemo;
+		};
+		4C9BF7FC22A7E395008BF342 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4C9BF7F522A7E394008BF342 /* UPCarouselFlowLayoutDemo.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 841C94FD1DDEE57F00B997F5;
+			remoteInfo = UPCarouselFlowLayout;
+		};
+		4C9BF7FE22A7E3AB008BF342 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4C9BF7F522A7E394008BF342 /* UPCarouselFlowLayoutDemo.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 841C94FC1DDEE57F00B997F5;
+			remoteInfo = UPCarouselFlowLayout;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -62,6 +85,8 @@
 		4C072B67229E6E5A00C9C3E7 /* WorkoutDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailViewController.swift; sourceTree = "<group>"; };
 		4C072B6B229EA22900C9C3E7 /* WorkoutTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTracker.swift; sourceTree = "<group>"; };
 		4C072B6E229FDC9200C9C3E7 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		4C9BF7F522A7E394008BF342 /* UPCarouselFlowLayoutDemo.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = UPCarouselFlowLayoutDemo.xcodeproj; path = ThirdParty/UPCarouselFlowLayout/UPCarouselFlowLayoutDemo.xcodeproj; sourceTree = "<group>"; };
+		4C9BF80222A7ED42008BF342 /* WorkoutSelectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSelectionViewCell.swift; sourceTree = "<group>"; };
 		4CADF11E22A67DC800AA31AA /* SettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
 		4CADF12022A6883A00AA31AA /* DistanceEnumTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceEnumTableViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -71,6 +96,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C9BF80022A7E3B3008BF342 /* UPCarouselFlowLayout.framework in Frameworks */,
 				4C072B6F229FDC9200C9C3E7 /* MapKit.framework in Frameworks */,
 				4C0400E02291B56500E2F5FA /* HealthKit.framework in Frameworks */,
 			);
@@ -130,6 +156,7 @@
 				4C0400B82291B4FC00E2F5FA /* LaunchScreen.storyboard */,
 				4C0400BB2291B4FC00E2F5FA /* Info.plist */,
 				4C0400B32291B4FB00E2F5FA /* BitFit.xcdatamodeld */,
+				4C9BF80222A7ED42008BF342 /* WorkoutSelectionViewCell.swift */,
 			);
 			path = BitFit;
 			sourceTree = "<group>";
@@ -155,10 +182,20 @@
 		4C0400DE2291B56500E2F5FA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4C9BF7F522A7E394008BF342 /* UPCarouselFlowLayoutDemo.xcodeproj */,
 				4C072B6E229FDC9200C9C3E7 /* MapKit.framework */,
 				4C0400DF2291B56500E2F5FA /* HealthKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4C9BF7F622A7E394008BF342 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4C9BF7FB22A7E395008BF342 /* UPCarouselFlowLayoutDemo.app */,
+				4C9BF7FD22A7E395008BF342 /* UPCarouselFlowLayout.framework */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -175,6 +212,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				4C9BF7FF22A7E3AB008BF342 /* PBXTargetDependency */,
 			);
 			name = BitFit;
 			productName = BitFit;
@@ -265,6 +303,12 @@
 			mainGroup = 4C0400A02291B4FA00E2F5FA;
 			productRefGroup = 4C0400AA2291B4FB00E2F5FA /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 4C9BF7F622A7E394008BF342 /* Products */;
+					ProjectRef = 4C9BF7F522A7E394008BF342 /* UPCarouselFlowLayoutDemo.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				4C0400A82291B4FA00E2F5FA /* BitFit */,
@@ -273,6 +317,23 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		4C9BF7FB22A7E395008BF342 /* UPCarouselFlowLayoutDemo.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = UPCarouselFlowLayoutDemo.app;
+			remoteRef = 4C9BF7FA22A7E395008BF342 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		4C9BF7FD22A7E395008BF342 /* UPCarouselFlowLayout.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = UPCarouselFlowLayout.framework;
+			remoteRef = 4C9BF7FC22A7E395008BF342 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		4C0400A72291B4FA00E2F5FA /* Resources */ = {
@@ -312,6 +373,7 @@
 				4C0161CE2296B36000A043A5 /* WorkoutHistoryViewController.swift in Sources */,
 				4C0400B52291B4FB00E2F5FA /* BitFit.xcdatamodeld in Sources */,
 				4C0400AD2291B4FB00E2F5FA /* AppDelegate.swift in Sources */,
+				4C9BF80322A7ED42008BF342 /* WorkoutSelectionViewCell.swift in Sources */,
 				4CADF11F22A67DC800AA31AA /* SettingsTableViewController.swift in Sources */,
 				4CADF12122A6883A00AA31AA /* DistanceEnumTableViewController.swift in Sources */,
 			);
@@ -345,6 +407,11 @@
 			isa = PBXTargetDependency;
 			target = 4C0400A82291B4FA00E2F5FA /* BitFit */;
 			targetProxy = 4C0400CC2291B4FC00E2F5FA /* PBXContainerItemProxy */;
+		};
+		4C9BF7FF22A7E3AB008BF342 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = UPCarouselFlowLayout;
+			targetProxy = 4C9BF7FE22A7E3AB008BF342 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
