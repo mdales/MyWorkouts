@@ -100,10 +100,10 @@ protocol WorkoutTrackerDelegate {
 class WorkoutTracker: NSObject {
     
     static let supportedWorkouts: [HKWorkoutActivityType] = [.walking,
-                                                             .running,
-                                                             .cycling,
                                                              .wheelchairWalkPace,
-                                                             .wheelchairRunPace]
+                                                             .running,
+                                                             .wheelchairRunPace,
+                                                             .cycling]
     
     let syncQ = DispatchQueue(label: "workout")
     let delegateQ = DispatchQueue(label: "workout delegate")
