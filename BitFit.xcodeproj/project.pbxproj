@@ -81,7 +81,7 @@
 
 /* Begin PBXFileReference section */
 		4C0161CD2296B36000A043A5 /* WorkoutHistoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutHistoryViewController.swift; sourceTree = "<group>"; };
-		4C0400A92291B4FB00E2F5FA /* BitFit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BitFit.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C0400A92291B4FB00E2F5FA /* MyWorkouts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyWorkouts.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C0400AC2291B4FB00E2F5FA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4C0400AE2291B4FB00E2F5FA /* RecordWorkoutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordWorkoutViewController.swift; sourceTree = "<group>"; };
 		4C0400B12291B4FB00E2F5FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -149,7 +149,7 @@
 		4C0400AA2291B4FB00E2F5FA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4C0400A92291B4FB00E2F5FA /* BitFit.app */,
+				4C0400A92291B4FB00E2F5FA /* MyWorkouts.app */,
 				4C0400C02291B4FC00E2F5FA /* BitFitTests.xctest */,
 				4C0400CB2291B4FC00E2F5FA /* BitFitUITests.xctest */,
 			);
@@ -218,9 +218,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4C0400A82291B4FA00E2F5FA /* BitFit */ = {
+		4C0400A82291B4FA00E2F5FA /* MyWorkouts */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4C0400D42291B4FC00E2F5FA /* Build configuration list for PBXNativeTarget "BitFit" */;
+			buildConfigurationList = 4C0400D42291B4FC00E2F5FA /* Build configuration list for PBXNativeTarget "MyWorkouts" */;
 			buildPhases = (
 				4C0400A52291B4FA00E2F5FA /* Sources */,
 				4C0400A62291B4FA00E2F5FA /* Frameworks */,
@@ -232,9 +232,9 @@
 			dependencies = (
 				4C9BF7FF22A7E3AB008BF342 /* PBXTargetDependency */,
 			);
-			name = BitFit;
+			name = MyWorkouts;
 			productName = BitFit;
-			productReference = 4C0400A92291B4FB00E2F5FA /* BitFit.app */;
+			productReference = 4C0400A92291B4FB00E2F5FA /* MyWorkouts.app */;
 			productType = "com.apple.product-type.application";
 		};
 		4C0400BF2291B4FC00E2F5FA /* BitFitTests */ = {
@@ -329,7 +329,7 @@
 			);
 			projectRoot = "";
 			targets = (
-				4C0400A82291B4FA00E2F5FA /* BitFit */,
+				4C0400A82291B4FA00E2F5FA /* MyWorkouts */,
 				4C0400BF2291B4FC00E2F5FA /* BitFitTests */,
 				4C0400CA2291B4FC00E2F5FA /* BitFitUITests */,
 			);
@@ -419,12 +419,12 @@
 /* Begin PBXTargetDependency section */
 		4C0400C22291B4FC00E2F5FA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 4C0400A82291B4FA00E2F5FA /* BitFit */;
+			target = 4C0400A82291B4FA00E2F5FA /* MyWorkouts */;
 			targetProxy = 4C0400C12291B4FC00E2F5FA /* PBXContainerItemProxy */;
 		};
 		4C0400CD2291B4FC00E2F5FA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 4C0400A82291B4FA00E2F5FA /* BitFit */;
+			target = 4C0400A82291B4FA00E2F5FA /* MyWorkouts */;
 			targetProxy = 4C0400CC2291B4FC00E2F5FA /* PBXContainerItemProxy */;
 		};
 		4C9BF7FF22A7E3AB008BF342 /* PBXTargetDependency */ = {
@@ -702,7 +702,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4C0400D42291B4FC00E2F5FA /* Build configuration list for PBXNativeTarget "BitFit" */ = {
+		4C0400D42291B4FC00E2F5FA /* Build configuration list for PBXNativeTarget "MyWorkouts" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4C0400D52291B4FC00E2F5FA /* Debug */,

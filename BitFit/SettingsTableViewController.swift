@@ -62,6 +62,10 @@ class SettingsTableViewController: UITableViewController {
         
         let paceAnnounce = defaults.bool(forKey: SettingsNames.DistanceAnnoucement.rawValue)
         paceAnnouncementsSwitch.isOn = paceAnnounce
+        
+        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+            versionLabel.text = version
+        }
     }
 
     @IBAction func distanceAnnouncementToggled(_ sender: Any) {
