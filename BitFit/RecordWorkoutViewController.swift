@@ -55,12 +55,6 @@ class RecordWorkoutViewController: UIViewController {
         }
     }
     
-    @IBAction func settings(_ sender: Any) {
-        UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!,
-                                  options: [:],
-                                  completionHandler: nil)
-    }
-    
     @IBAction func changeActivity(_ sender: Any) {
         
         activityTypeIndex = (activityTypeIndex + 1) % WorkoutTracker.supportedWorkouts.count
@@ -155,22 +149,8 @@ class RecordWorkoutViewController: UIViewController {
                 print("Error stopping workout: \(err)")
             }
             
-//            let duration = endDate.timeIntervalSince(finishedWorkout.startDate)
-//            let minutes = Int(duration / 60.0)
-//            let seconds = Int(duration) - (minutes * 60)
-//            var completionProse = "Workout completed. Time \(minutes) minutes and \(seconds) seconds. "
-//
-//            if let distanceQuantity = finishedWorkout.totalDistance {
-//                let distance = distanceQuantity.doubleValue(for: .mile())
-//                let distanceProse = String(format: " %.2f miles", distance)
-//                completionProse += distanceProse
-//            }
-//
-//            let completePhrase = AVSpeechUtterance(string: completionProse)
-            
             DispatchQueue.main.async {
                 self.workoutTracker = nil
-                //self.synthesizer.speak(completePhrase)
                 self.toggleButton.setTitle("Start", for: .normal)
                 self.activityButton.isEnabled = true
                 self.splitsTableView.reloadData()
@@ -224,14 +204,18 @@ extension RecordWorkoutViewController: WorkoutTrackerDelegate {
                 return
             }
             
+            var phrase = ""
+            let announceDistance = UserDefaults.standard.bool(forKey: SettingsNames.DistanceAnnoucement.rawValue)
+            let announceTime = UserDefaults.standard.bool(forKey: SettingsNames.TimeAnnouncement.rawValue)
+            let announcePace = UserDefaults.standard.bool(forKey: SettingsNames.PaceAnnouncement.rawValue)
+            
             let latestSplit = latestSplits[latestSplits.count - 1]
             let priorSplit = latestSplits[finalUpdate ? 0 : latestSplits.count - 2]
             let firstSplit = latestSplits[0]
             
             let splitDuration = latestSplit.time.timeIntervalSince(priorSplit.time)
             let splitDistance = latestSplit.distance - firstSplit.distance
-            
-            var phrase = finalUpdate ? "Total " : ""
+            let pace = splitDistance / splitDuration
             
             let formatter = DateComponentsFormatter()
             formatter.allowedUnits = [.hour, .minute, .second]
@@ -246,10 +230,34 @@ extension RecordWorkoutViewController: WorkoutTrackerDelegate {
             switch units {
             case .Miles:
                 let distance = splitDistance / 1609.34
-                phrase = String(format: "%@ Distance %@ miles. Time %@", phrase, numFormatter.string(from: NSNumber(floatLiteral: distance))!, durationPhrase)
+                
+                if announceDistance {
+                    phrase = String(format: "%@ Distance %@ miles. ", phrase, numFormatter.string(from: NSNumber(floatLiteral: distance))!)
+                }
+                if announceTime {
+                    phrase = String(format: "%@ %@ time %@. ", phrase, finalUpdate ? "Total" : "", durationPhrase)
+                }
+                if announcePace {
+                    phrase = String(format: "%@ Pace %@ miles per hour. ", phrase, numFormatter.string(from: NSNumber(floatLiteral: pace * 2.236936))!)
+                }
+                
             case .Kilometers:
                 let distance = splitDistance / 1000.0
-                phrase = String(format: "%@ Distance %@ kilometers. Time %@", phrase, numFormatter.string(from: NSNumber(floatLiteral: distance))!, durationPhrase)
+                
+                if announceDistance {
+                    phrase = String(format: "%@ Distance %@ miles. ", phrase, numFormatter.string(from: NSNumber(floatLiteral: distance))!)
+                }
+                if announceTime {
+                    phrase = String(format: "%@ %@ time %@. ", phrase, finalUpdate ? "Total" : "", durationPhrase)
+                }
+                if announcePace {
+                    phrase = String(format: "%@ Pace %@ kilometers per hour. ", phrase, numFormatter.string(from: NSNumber(floatLiteral: pace * 3.6))!)
+                }
+            }
+            
+            // nothing to say
+            if phrase.count == 0 {
+                return
             }
             
             let spokenPhrase = AVSpeechUtterance(string: phrase)

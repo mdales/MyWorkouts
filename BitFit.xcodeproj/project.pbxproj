@@ -18,9 +18,10 @@
 		4C0400D02291B4FC00E2F5FA /* BitFitUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0400CF2291B4FC00E2F5FA /* BitFitUITests.swift */; };
 		4C0400E02291B56500E2F5FA /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C0400DF2291B56500E2F5FA /* HealthKit.framework */; };
 		4C072B68229E6E5A00C9C3E7 /* WorkoutDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C072B67229E6E5A00C9C3E7 /* WorkoutDetailViewController.swift */; };
-		4C072B6A229E99F700C9C3E7 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4C072B69229E99F700C9C3E7 /* Settings.bundle */; };
 		4C072B6C229EA22900C9C3E7 /* WorkoutTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C072B6B229EA22900C9C3E7 /* WorkoutTracker.swift */; };
 		4C072B6F229FDC9200C9C3E7 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C072B6E229FDC9200C9C3E7 /* MapKit.framework */; };
+		4CADF11F22A67DC800AA31AA /* SettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CADF11E22A67DC800AA31AA /* SettingsTableViewController.swift */; };
+		4CADF12122A6883A00AA31AA /* DistanceEnumTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CADF12022A6883A00AA31AA /* DistanceEnumTableViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,9 +60,10 @@
 		4C0400DD2291B56500E2F5FA /* BitFit.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BitFit.entitlements; sourceTree = "<group>"; };
 		4C0400DF2291B56500E2F5FA /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		4C072B67229E6E5A00C9C3E7 /* WorkoutDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailViewController.swift; sourceTree = "<group>"; };
-		4C072B69229E99F700C9C3E7 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		4C072B6B229EA22900C9C3E7 /* WorkoutTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTracker.swift; sourceTree = "<group>"; };
 		4C072B6E229FDC9200C9C3E7 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		4CADF11E22A67DC800AA31AA /* SettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
+		4CADF12022A6883A00AA31AA /* DistanceEnumTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceEnumTableViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,12 +123,13 @@
 				4C0400AE2291B4FB00E2F5FA /* RecordWorkoutViewController.swift */,
 				4C0161CD2296B36000A043A5 /* WorkoutHistoryViewController.swift */,
 				4C072B67229E6E5A00C9C3E7 /* WorkoutDetailViewController.swift */,
+				4CADF11E22A67DC800AA31AA /* SettingsTableViewController.swift */,
+				4CADF12022A6883A00AA31AA /* DistanceEnumTableViewController.swift */,
 				4C0400B02291B4FB00E2F5FA /* Main.storyboard */,
 				4C0400B62291B4FC00E2F5FA /* Assets.xcassets */,
 				4C0400B82291B4FC00E2F5FA /* LaunchScreen.storyboard */,
 				4C0400BB2291B4FC00E2F5FA /* Info.plist */,
 				4C0400B32291B4FB00E2F5FA /* BitFit.xcdatamodeld */,
-				4C072B69229E99F700C9C3E7 /* Settings.bundle */,
 			);
 			path = BitFit;
 			sourceTree = "<group>";
@@ -276,7 +279,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4C072B6A229E99F700C9C3E7 /* Settings.bundle in Resources */,
 				4C0400BA2291B4FC00E2F5FA /* LaunchScreen.storyboard in Resources */,
 				4C0400B72291B4FC00E2F5FA /* Assets.xcassets in Resources */,
 				4C0400B22291B4FB00E2F5FA /* Main.storyboard in Resources */,
@@ -310,6 +312,8 @@
 				4C0161CE2296B36000A043A5 /* WorkoutHistoryViewController.swift in Sources */,
 				4C0400B52291B4FB00E2F5FA /* BitFit.xcdatamodeld in Sources */,
 				4C0400AD2291B4FB00E2F5FA /* AppDelegate.swift in Sources */,
+				4CADF11F22A67DC800AA31AA /* SettingsTableViewController.swift in Sources */,
+				4CADF12122A6883A00AA31AA /* DistanceEnumTableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

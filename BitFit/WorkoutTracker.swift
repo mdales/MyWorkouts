@@ -10,7 +10,7 @@ import Foundation
 import HealthKit
 import CoreLocation
 
-enum DistanceUnit: String {
+enum DistanceUnit: String, CaseIterable {
     case Miles
     case Kilometers
 }
@@ -476,7 +476,7 @@ extension WorkoutTracker: CLLocationManagerDelegate {
 
 extension WorkoutTracker {
     static func getDistanceUnitSetting() -> DistanceUnit {
-        if let distanceUnits = UserDefaults.standard.string(forKey: "distance_units") {
+        if let distanceUnits = UserDefaults.standard.string(forKey: SettingsNames.DistanceUnits.rawValue) {
             if let newUnits = DistanceUnit(rawValue: distanceUnits) {
                 return newUnits
             }
