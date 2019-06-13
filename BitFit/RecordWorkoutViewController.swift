@@ -342,7 +342,7 @@ extension RecordWorkoutViewController: WorkoutTrackerDelegate {
                 let distance = splitDistance / 1000.0
                 
                 if announceDistance {
-                    phrase = String(format: "%@ Distance %@ miles. --", phrase, numFormatter.string(from: NSNumber(floatLiteral: distance))!)
+                    phrase = String(format: "%@ Distance %@ kilometers. --", phrase, numFormatter.string(from: NSNumber(floatLiteral: distance))!)
                 }
                 if announceTime {
                     phrase = String(format: "%@ %@ time %@. --", phrase, finalUpdate ? "Total" : "", durationPhrase)
