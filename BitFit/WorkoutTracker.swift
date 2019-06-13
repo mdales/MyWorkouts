@@ -244,6 +244,8 @@ class WorkoutTracker: NSObject {
         dispatchPrecondition(condition: .notOnQueue(syncQ))
         syncQ.sync {
             locationManager.stopUpdatingLocation()
+            locationManager.delegate = nil
+            
             
             guard let workoutBuilder = self.workoutBuilder else {
                 DispatchQueue.global().async {
@@ -449,10 +451,8 @@ extension WorkoutTracker: CLLocationManagerDelegate {
                 }
                 
                 for location in filteredLocations {
-                    print("speed: \(location.speed)")
                     if let last = lastLocation {
                         let newDistance = location.distance(from: last)
-                        print("distance: \(newDistance)")
                         distance += newDistance
                         
                         if distance > (self.splitDistance * Double(self.splits.count)) {

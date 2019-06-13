@@ -8,6 +8,7 @@
 
 import UIKit
 import HealthKit
+import CoreLocation
 import AVKit
 import os.log
 import UPCarouselFlowLayout
@@ -99,6 +100,20 @@ class RecordWorkoutViewController: UIViewController {
             try audioSession.setCategory(.playback, options: [.duckOthers, .interruptSpokenAudioAndMixWithOthers])
         } catch {
             print("Failed to duck other sounds")
+        }
+        
+        // warm up the GPS here
+        if workoutTracker == nil {
+            appDelegate.locationManager.delegate = self
+            appDelegate.locationManager.startUpdatingLocation()
+        }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if workoutTracker == nil {
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            appDelegate.locationManager.stopUpdatingLocation()
         }
     }
     
@@ -557,4 +572,13 @@ extension RecordWorkoutViewController: UICollectionViewDataSource {
         return cell
     }
     
+}
+
+extension RecordWorkoutViewController: CLLocationManagerDelegate {
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        for location in locations {
+            print("Warming GPS accuracy to \(location.horizontalAccuracy)")
+        }
+    }
 }
