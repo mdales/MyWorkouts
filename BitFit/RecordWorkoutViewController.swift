@@ -329,7 +329,12 @@ extension RecordWorkoutViewController: WorkoutTrackerDelegate {
                 let distance = splitDistance / 1609.34
                 
                 if announceDistance {
-                    phrase = String(format: "%@ Distance %@ miles. --", phrase, numFormatter.string(from: NSNumber(floatLiteral: distance))!)
+                    var unit = "s"
+                    if Int(distance * 100) == 100 {
+                        unit = ""
+                    }
+                    
+                    phrase = String(format: "%@ Distance %@ mile%@. --", phrase, numFormatter.string(from: NSNumber(floatLiteral: distance))!, unit)
                 }
                 if announceTime {
                     phrase = String(format: "%@ %@ time %@. --", phrase, finalUpdate ? "Total" : "", durationPhrase)
@@ -342,7 +347,12 @@ extension RecordWorkoutViewController: WorkoutTrackerDelegate {
                 let distance = splitDistance / 1000.0
                 
                 if announceDistance {
-                    phrase = String(format: "%@ Distance %@ kilometers. --", phrase, numFormatter.string(from: NSNumber(floatLiteral: distance))!)
+                    var unit = "s"
+                    if Int(distance * 100) == 100 {
+                        unit = ""
+                    }
+                    
+                    phrase = String(format: "%@ Distance %@ kilometer%@. --", phrase, numFormatter.string(from: NSNumber(floatLiteral: distance))!, unit)
                 }
                 if announceTime {
                     phrase = String(format: "%@ %@ time %@. --", phrase, finalUpdate ? "Total" : "", durationPhrase)
@@ -513,7 +523,13 @@ extension RecordWorkoutViewController: UITableViewDataSource {
             switch units {
             case .Miles:
                 let distance = split.distance / 1609.34
-                cell.detailTextLabel?.text = String(format: "%.2f miles", distance)
+                
+                var unit = "s"
+                if Int(distance * 100) == 100 {
+                    unit = ""
+                }
+                
+                cell.detailTextLabel?.text = String(format: "%.2f mile%@", distance, unit)
             case .Kilometers:
                 let distance = split.distance / 1000.0
                 cell.detailTextLabel?.text = String(format: "%.2f km", distance)
