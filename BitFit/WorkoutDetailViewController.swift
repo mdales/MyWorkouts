@@ -19,6 +19,8 @@ class RouteCell: UITableViewCell {
     func setWorkout(_ workout: HKWorkout) {
         
         routeMapView.delegate = self
+        routeMapView.removeAnnotations(routeMapView.annotations)
+        routeMapView.removeOverlays(routeMapView.overlays)
         
         points = [CLLocationCoordinate2D]()
         
@@ -76,10 +78,26 @@ class RouteCell: UITableViewCell {
                 fatalError("*** Invalid State: This can only fail if there was an error. ***")
             }
             
+            // is this the first point?
+            if self.points.count == 0 && locations.count > 0 {
+                let annotation = MKPointAnnotation()
+                annotation.title = "Start"
+                annotation.coordinate = locations[0].coordinate
+                self.routeMapView.addAnnotation(annotation)
+            }
+            
             let locations2D = locations.map { return $0.coordinate }
             self.points += locations2D
             
             if done {
+                
+                if self.points.count > 0 {
+                    let annotation = MKPointAnnotation()
+                    annotation.title = "End"
+                    annotation.coordinate = self.points[self.points.count - 1]
+                    self.routeMapView.addAnnotation(annotation)
+                }
+                
                 let polyline = MKPolyline(coordinates: self.points, count: self.points.count)
                 DispatchQueue.main.async {
                     self.routeMapView.addOverlay(polyline)

@@ -455,6 +455,8 @@ extension RecordWorkoutViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "splitsReuseIdentifier", for: indexPath)
         
         if latestSplits.count == 0 {
+            cell.textLabel?.text = ""
+            cell.detailTextLabel?.text = ""
             return cell
         }
         
