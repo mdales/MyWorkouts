@@ -45,16 +45,14 @@ class RecordWorkoutViewController: UIViewController {
     var updateTimer: Timer? = nil
     var workoutTracker: WorkoutTracker?
     
-    var activityTypeIndex = 0
+    var activityTypeIndex = 0 {
+        didSet {
+             UserDefaults.standard.set(activityTypeIndex, forKey: "LastActivityIndex")
+        }
+    }
     
     var latestSplits = [WorkoutSplit]()
     
-    fileprivate var currentPage: Int = 0 {
-        didSet {
-            let activityType = WorkoutTracker.supportedWorkouts[self.currentPage]
-            self.activityLabel.text = "Activity: \(activityType.DisplayString())"
-        }
-    }
     
     fileprivate var pageSize: CGSize {
         let layout = self.activityCollectionView.collectionViewLayout as! UPCarouselFlowLayout
@@ -79,15 +77,15 @@ class RecordWorkoutViewController: UIViewController {
         layout.spacingMode = .fixed(spacing: 10.0)
         
         activityTypeIndex = UserDefaults.standard.integer(forKey: "LastActivityIndex")
-        currentPage = activityTypeIndex
         
-        
-        let indexPath = IndexPath(item: currentPage, section: 0)
+        let indexPath = IndexPath(item: activityTypeIndex, section: 0)
         let scrollPosition: UICollectionView.ScrollPosition = .centeredHorizontally
         self.activityCollectionView.scrollToItem(at: indexPath, at: scrollPosition, animated: false)
-        lockedActivityImageView.image = UIImage(named: WorkoutTracker.supportedWorkouts[activityTypeIndex].String())
-        
-        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateUI()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -103,15 +101,6 @@ class RecordWorkoutViewController: UIViewController {
             print("Failed to duck other sounds")
         }
     }
-    
-//    @IBAction func changeActivity(_ sender: Any) {
-//
-//        activityTypeIndex = (activityTypeIndex + 1) % WorkoutTracker.supportedWorkouts.count
-//        UserDefaults.standard.set(activityTypeIndex, forKey: "LastActivityIndex")
-//
-//        let activityType = WorkoutTracker.supportedWorkouts[activityTypeIndex]
-//        activityButton.setImage(UIImage(named:activityType.String()), for: .normal)
-//    }
     
     @IBAction func toggleWorkout(_ sender: Any) {
         
@@ -161,9 +150,7 @@ class RecordWorkoutViewController: UIViewController {
         do {
             try workout.startWorkout(healthStore: appDelegate.healthStore)
             
-//            self.activityButton.isEnabled = false
-            self.lockedActivityImageView.isHidden = false
-            self.activityCollectionView.isHidden = true
+            self.updateUI()
             self.splitsTableView.reloadData()
             
             self.updateTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { _ in
@@ -201,12 +188,59 @@ class RecordWorkoutViewController: UIViewController {
             
             DispatchQueue.main.async {
                 self.workoutTracker = nil
-                self.toggleButton.setTitle("Start", for: .normal)
-//                self.activityButton.isEnabled = true
-                self.activityCollectionView.isHidden = false
-                self.lockedActivityImageView.isHidden = true
                 self.splitsTableView.reloadData()
+                self.updateUI()
             }
+        }
+    }
+    
+    func updateUI() {
+        dispatchPrecondition(condition: .onQueue(DispatchQueue.main))
+        
+        // Get all the info we need
+        let activityType = WorkoutTracker.supportedWorkouts[self.activityTypeIndex]
+        var workoutState = WorkoutState.Before
+        if let workoutTracker = self.workoutTracker {
+            workoutState = workoutTracker.state
+        }
+        
+        // set the active activity image
+        lockedActivityImageView.image = UIImage(named: activityType.String())
+        
+        // set GPS indicator
+        switch workoutState {
+        case .WaitingForGPS, .WaitingForLocationStream:
+            gpsAccuracyImage.isHidden = false
+        default:
+            gpsAccuracyImage.isHidden = true
+        }
+        
+        // Set button title
+        switch workoutState {
+        case .Before, .Stopped, .Failed:
+            self.toggleButton.setTitle("Start", for: .normal)
+        case .WaitingForGPS, .WaitingForLocationStream:
+            self.toggleButton.setTitle("Cancel", for: .normal)
+        default:
+            self.toggleButton.setTitle("Stop", for: .normal)
+        }
+        
+        // set activity view
+        switch workoutState {
+        case .Before, .Stopped, .Failed:
+            self.activityCollectionView.isHidden = false
+            self.lockedActivityImageView.isHidden = true
+        default:
+            self.activityCollectionView.isHidden = true
+            self.lockedActivityImageView.isHidden = false
+        }
+        
+        // set activity text
+        switch workoutState {
+        case .WaitingForGPS, .WaitingForLocationStream:
+            self.activityLabel.text = "Waiting for GPS..."
+        default:
+            self.activityLabel.text = "Activity: \(activityType.DisplayString())"
         }
     }
 }
@@ -214,40 +248,28 @@ class RecordWorkoutViewController: UIViewController {
 extension RecordWorkoutViewController: WorkoutTrackerDelegate {
     
     func stateUpdated(newState: WorkoutState) {
-        
         DispatchQueue.main.async {
+            self.updateUI()
+            self.splitsTableView.reloadData()
+            
+            // Do any announcements
             switch newState {
-            case .WaitingForGPS, .WaitingForLocationStream:
-                self.gpsAccuracyImage.isHidden = false
-                self.activityLabel.text = "Waiting for GPS..."
-                self.toggleButton.setTitle("Cancel", for: .normal)
             case .Started:
-                self.gpsAccuracyImage.isHidden = true
-                let activityType = WorkoutTracker.supportedWorkouts[self.activityTypeIndex]
-                self.activityLabel.text = "Activity: \(activityType.DisplayString())"
-                self.toggleButton.setTitle("Stop", for: .normal)
-                
                 let spokenPhrase = AVSpeechUtterance(string: "Go!")
                 let audioSession = AVAudioSession.sharedInstance()
                 try? audioSession.setActive(true)
                 self.synthesizer.speak(spokenPhrase)
-            case .Failed:
-                self.workoutTracker = nil
-                self.toggleButton.setTitle("Start", for: .normal)
-//                self.activityButton.isEnabled = true
-                self.activityCollectionView.isHidden = false
-                self.lockedActivityImageView.isHidden = true
-                self.splitsTableView.reloadData()
                 
-                let spokenPhrase = AVSpeechUtterance(string: "Sorry, workout failed.")
+            case .Failed:
+                let spokenPhrase = AVSpeechUtterance(string: "Workout failed.")
                 let audioSession = AVAudioSession.sharedInstance()
                 try? audioSession.setActive(true)
                 self.synthesizer.speak(spokenPhrase)
+                
             default:
-                self.gpsAccuracyImage.isHidden = true
+                break
             }
         }
-        
     }
     
     func splitsUpdated(latestSplits: [WorkoutSplit], finalUpdate: Bool) {
@@ -485,30 +507,36 @@ extension RecordWorkoutViewController: UITableViewDataSource {
     }
 }
 
-//extension RecordWorkoutViewController: UICollectionViewDelegate {
-//
-//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        let activityType = WorkoutTracker.supportedWorkouts[indexPath.row]
-//
-//        let alert = UIAlertController(title: activityType.String(), message: nil, preferredStyle: .alert)
-//        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-//        present(alert, animated: true, completion: nil)
-//    }
-//
-//}
+extension RecordWorkoutViewController: UICollectionViewDelegate {
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+
+        let targetActivityIndex = indexPath.row
+        
+        let indexPath = IndexPath(item: targetActivityIndex, section: 0)
+        let scrollPosition: UICollectionView.ScrollPosition = .centeredHorizontally
+        self.activityCollectionView.scrollToItem(at: indexPath, at: scrollPosition, animated: true)
+        
+        activityTypeIndex = targetActivityIndex
+        updateUI()
+    }
+
+}
 
 extension RecordWorkoutViewController: UIScrollViewDelegate {
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+
+        guard ((scrollView as? UICollectionView) != nil) else {
+            return
+        }
+        
         let layout = self.activityCollectionView.collectionViewLayout as! UPCarouselFlowLayout
         let pageSide = (layout.scrollDirection == .horizontal) ? self.pageSize.width : self.pageSize.height
         let offset = (layout.scrollDirection == .horizontal) ? scrollView.contentOffset.x : scrollView.contentOffset.y
-        currentPage = Int(floor((offset - pageSide / 2) / pageSide) + 1)
+        activityTypeIndex = Int(floor((offset - pageSide / 2) / pageSide) + 1)
         
-        activityTypeIndex = currentPage
-        UserDefaults.standard.set(activityTypeIndex, forKey: "LastActivityIndex")
-        let activityType = WorkoutTracker.supportedWorkouts[activityTypeIndex]
-        lockedActivityImageView.image = UIImage(named: activityType.String())
+        self.updateUI()
     }
 }
 
