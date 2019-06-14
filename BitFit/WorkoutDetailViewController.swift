@@ -101,7 +101,7 @@ class RouteCell: UITableViewCell {
                 let polyline = MKPolyline(coordinates: self.points, count: self.points.count)
                 DispatchQueue.main.async {
                     self.routeMapView.addOverlay(polyline)
-                    self.routeMapView.setVisibleMapRect(polyline.boundingMapRect, edgePadding: UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0), animated: false)
+                    self.routeMapView.setVisibleMapRect(polyline.boundingMapRect, edgePadding: UIEdgeInsets(top: 20.0, left: 20.0, bottom: 10.0, right: 20.0), animated: false)
                 }
                 
             }

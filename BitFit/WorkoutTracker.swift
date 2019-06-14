@@ -105,6 +105,8 @@ class WorkoutTracker: NSObject {
                                                              .wheelchairRunPace,
                                                              .cycling]
     
+    let peakSpeedBufferSize = 5
+    
     let syncQ = DispatchQueue(label: "workout")
     let delegateQ = DispatchQueue(label: "workout delegate")
     
@@ -117,6 +119,7 @@ class WorkoutTracker: NSObject {
     // Should only be updated on syncQ
     var state = WorkoutState.Before
     var splits = [WorkoutSplit]()
+    var peakSpeedBuffer = [CLLocation]()
     var peakSpeed = 0.0
     var currentSpeed = 0.0
     var workoutBuilder: HKWorkoutBuilder?
@@ -462,7 +465,15 @@ extension WorkoutTracker: CLLocationManagerDelegate {
                                 self.delegate.splitsUpdated(latestSplits: s, finalUpdate: false)
                             }
                         }
+                    }
+                    lastLocation = location
                         
+                    if peakSpeedBuffer.count >= peakSpeedBufferSize {
+                        peakSpeedBuffer.remove(at: 0)
+                    }
+                    peakSpeedBuffer.append(location)
+                    if peakSpeedBuffer.count == peakSpeedBufferSize {
+                        let last = peakSpeedBuffer[0]                        
                         let currentDuration = location.timestamp.timeIntervalSince(last.timestamp)
                         let currentDistance = location.distance(from: last)
                         self.currentSpeed = currentDistance / currentDuration
@@ -470,7 +481,6 @@ extension WorkoutTracker: CLLocationManagerDelegate {
                             self.peakSpeed = self.currentSpeed
                         }
                     }
-                    lastLocation = location
                 }
                 
                 builder.insertRouteData(locations) { (success, error) in
