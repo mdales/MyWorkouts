@@ -13,13 +13,13 @@
         <!--Workouts-->
         <scene sceneID="TOw-7V-ngX">
             <objects>
-                <tableViewController title="Workouts" id="fRM-Zt-7oY" customClass="WorkoutHistoryViewController" customModule="BitFit" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController title="Workouts" id="fRM-Zt-7oY" customClass="WorkoutHistoryViewController" customModule="MyWorkouts" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="dFI-nu-oGg">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="reuseIdentifier" rowHeight="115" id="kgw-h7-387" customClass="WorkoutHistoryCell" customModule="BitFit" customModuleProvider="target">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="reuseIdentifier" rowHeight="115" id="kgw-h7-387" customClass="WorkoutHistoryCell" customModule="MyWorkouts" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="28" width="375" height="115"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="kgw-h7-387" id="vYV-Ts-j2v">
@@ -114,7 +114,7 @@
         <!--Record-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController title="Record" id="BYZ-38-t0r" customClass="RecordWorkoutViewController" customModule="BitFit" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Record" id="BYZ-38-t0r" customClass="RecordWorkoutViewController" customModule="MyWorkouts" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -153,13 +153,6 @@
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="wHz-PU-NrN"/>
                                 </connections>
                             </tableView>
-                            <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="noGPS" translatesAutoresizingMaskIntoConstraints="NO" id="MB9-DJ-V5D">
-                                <rect key="frame" x="315" y="44" width="44" height="44"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="44" id="C43-iP-klW"/>
-                                    <constraint firstAttribute="height" constant="44" id="taK-Hj-8fb"/>
-                                </constraints>
-                            </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aki-hG-Oaw">
                                 <rect key="frame" x="16" y="292" width="343" height="48"/>
                                 <color key="backgroundColor" name="systemPinkColor" catalog="System" colorSpace="catalog"/>
@@ -192,7 +185,7 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="activitySelectorCell" id="Syw-KD-sjt" customClass="WorkoutSelectionViewCell" customModule="BitFit" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="activitySelectorCell" id="Syw-KD-sjt" customClass="WorkoutSelectionViewCell" customModule="MyWorkouts" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="2.6666666666666665" width="152" height="152"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
@@ -238,10 +231,8 @@
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="q1J-oW-cTT" firstAttribute="top" secondItem="v4R-WX-QlH" secondAttribute="bottom" constant="21" id="1iJ-MP-QNl"/>
-                            <constraint firstItem="MB9-DJ-V5D" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="A7b-r9-Iuo"/>
                             <constraint firstItem="Rau-be-A50" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="ElI-e0-Qtt"/>
                             <constraint firstItem="q1J-oW-cTT" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="FPF-du-Ff0"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="MB9-DJ-V5D" secondAttribute="trailing" constant="16" id="JY5-n9-Vdy"/>
                             <constraint firstItem="v4R-WX-QlH" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="Kma-s7-z3e"/>
                             <constraint firstItem="v4R-WX-QlH" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="NTB-Vc-1Lt"/>
                             <constraint firstItem="Rau-be-A50" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="22" id="VsK-yB-I7O"/>
@@ -263,7 +254,6 @@
                     <connections>
                         <outlet property="activityCollectionView" destination="v4R-WX-QlH" id="dAM-Nk-Pzi"/>
                         <outlet property="activityLabel" destination="q1J-oW-cTT" id="wGQ-6j-MJ6"/>
-                        <outlet property="gpsAccuracyImage" destination="MB9-DJ-V5D" id="zSV-h3-h1i"/>
                         <outlet property="lockedActivityImageView" destination="Rau-be-A50" id="h9N-BE-a87"/>
                         <outlet property="splitsTableView" destination="H8R-J8-4gD" id="8bz-gc-BYK"/>
                         <outlet property="toggleButton" destination="aki-hG-Oaw" id="UhM-Si-H74"/>
@@ -276,7 +266,7 @@
         <!--Workout Detail View Controller-->
         <scene sceneID="Uo9-N3-ZMh">
             <objects>
-                <tableViewController id="h0z-aH-fLj" customClass="WorkoutDetailViewController" customModule="BitFit" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController id="h0z-aH-fLj" customClass="WorkoutDetailViewController" customModule="MyWorkouts" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="eJq-Go-M6t">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -306,7 +296,7 @@
                                     </subviews>
                                 </tableViewCellContentView>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="routeReuseIdentifier" rowHeight="348" id="q6F-m2-Qj5" customClass="RouteCell" customModule="BitFit" customModuleProvider="target">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="routeReuseIdentifier" rowHeight="348" id="q6F-m2-Qj5" customClass="RouteCell" customModule="MyWorkouts" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="72" width="375" height="348"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="q6F-m2-Qj5" id="1RL-ih-ssk">
@@ -337,7 +327,7 @@
         <!--Settings-->
         <scene sceneID="skX-bk-SdQ">
             <objects>
-                <tableViewController title="Settings" id="dTh-c3-ZZk" customClass="SettingsTableViewController" customModule="BitFit" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController title="Settings" id="dTh-c3-ZZk" customClass="SettingsTableViewController" customModule="MyWorkouts" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="bNZ-3M-jkW">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -552,7 +542,7 @@
         <!--Distance Enum Table View Controller-->
         <scene sceneID="XZl-cS-raX">
             <objects>
-                <tableViewController id="AZe-p6-s6P" customClass="DistanceEnumTableViewController" customModule="BitFit" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController id="AZe-p6-s6P" customClass="DistanceEnumTableViewController" customModule="MyWorkouts" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="jEw-cP-wDb">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -590,7 +580,7 @@
         <!--Third Party License View Controller-->
         <scene sceneID="Ocv-9W-3CL">
             <objects>
-                <viewController id="vtH-zw-TZs" customClass="ThirdPartyLicenseViewController" customModule="BitFit" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="vtH-zw-TZs" customClass="ThirdPartyLicenseViewController" customModule="MyWorkouts" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="0Qc-Wk-HnN">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -635,7 +625,6 @@
     </scenes>
     <resources>
         <image name="archive" width="25" height="25"/>
-        <image name="noGPS" width="60" height="60"/>
         <image name="settings" width="25" height="25"/>
         <image name="stopwatch" width="25" height="25"/>
         <image name="walking" width="100" height="100"/>

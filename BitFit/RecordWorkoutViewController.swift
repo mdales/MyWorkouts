@@ -39,7 +39,6 @@ class RecordWorkoutViewController: UIViewController {
     @IBOutlet weak var activityLabel: UILabel!
     @IBOutlet weak var toggleButton: UIButton!
     @IBOutlet weak var splitsTableView: UITableView!
-    @IBOutlet weak var gpsAccuracyImage: UIImageView!
     
     let synthesizer = AVSpeechSynthesizer()
     
@@ -209,6 +208,27 @@ class RecordWorkoutViewController: UIViewController {
         }
     }
     
+    func animateGPS() {
+        
+        var workoutState = WorkoutState.Before
+        if let workoutTracker = self.workoutTracker {
+            workoutState = workoutTracker.state
+        }
+        if ![WorkoutState.WaitingForGPS, WorkoutState.WaitingForLocationStream].contains(workoutState) {
+            return
+        }
+        
+        let starting = lockedActivityImageView.alpha == 1.0
+        
+        UIView.animate(withDuration: 1.5, delay: 0.0, options: UIView.AnimationOptions.curveEaseInOut, animations: {
+            self.lockedActivityImageView.alpha = starting ? 0.5 : 1.0
+        }, completion: { (finished: Bool) in
+            if finished {
+                self.animateGPS()
+            }
+        });
+    }
+    
     func updateUI() {
         dispatchPrecondition(condition: .onQueue(DispatchQueue.main))
         
@@ -220,14 +240,14 @@ class RecordWorkoutViewController: UIViewController {
         }
         
         // set the active activity image
-        lockedActivityImageView.image = UIImage(named: activityType.String())
-        
-        // set GPS indicator
         switch workoutState {
-        case .WaitingForGPS, .WaitingForLocationStream:
-            gpsAccuracyImage.isHidden = false
+        case .WaitingForLocationStream, .WaitingForGPS:
+            lockedActivityImageView.image = UIImage(named: "noGPS")
+            animateGPS()
         default:
-            gpsAccuracyImage.isHidden = true
+            lockedActivityImageView.image = UIImage(named: activityType.String())
+            lockedActivityImageView.layer.removeAllAnimations()
+            lockedActivityImageView.alpha = 1.0
         }
         
         // Set button title
