@@ -65,6 +65,9 @@ class RouteCell: UITableViewCell {
             return
         }
         
+        var distance = 0.0
+        var last_loc: CLLocation? = nil
+        
         let query = HKWorkoutRouteQuery(route: route) { (query, locationsOrNil, done, errorOrNil) in
             
             // This block may be called multiple times.
@@ -86,6 +89,23 @@ class RouteCell: UITableViewCell {
                 self.routeMapView.addAnnotation(annotation)
             }
             
+            let splitDistance = WorkoutTracker.getDistanceUnitSetting() == .Miles ? 1609.34 : 1000.0
+            let units = WorkoutTracker.getDistanceUnitSetting() == .Miles ? "m" : "km"
+            for loc in locations {
+                if let last = last_loc {
+                    let delta = loc.distance(from: last)
+                    let last_disance = distance
+                    distance += delta
+                    if Int(distance / splitDistance) != Int(last_disance / splitDistance) {
+                        let annotation = MKPointAnnotation()
+                        annotation.title = "\(Int(distance/splitDistance)) \(units)"
+                        annotation.coordinate = loc.coordinate
+                        self.routeMapView.addAnnotation(annotation)
+                    }
+                }
+                last_loc = loc
+            }
+            
             let locations2D = locations.map { return $0.coordinate }
             self.points += locations2D
             
@@ -105,10 +125,6 @@ class RouteCell: UITableViewCell {
                 }
                 
             }
-            
-            // You can stop the query by calling:
-            // store.stop(query)
-            
         }
         
         DispatchQueue.main.async {
