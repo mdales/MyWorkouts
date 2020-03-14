@@ -459,7 +459,7 @@ extension WorkoutTracker: CLLocationManagerDelegate {
                         distance += newDistance
                         
                         if distance > (self.splitDistance * Double(self.splits.count)) {
-                            self.splits.append(WorkoutSplit(time: Date(), distance: distance))
+                            self.splits.append(WorkoutSplit(time: location.timestamp, distance: distance))
                             let s = self.splits
                             self.delegateQ.async {
                                 self.delegate.splitsUpdated(latestSplits: s, finalUpdate: false)
@@ -473,12 +473,29 @@ extension WorkoutTracker: CLLocationManagerDelegate {
                     }
                     peakSpeedBuffer.append(location)
                     if peakSpeedBuffer.count == peakSpeedBufferSize {
-                        let last = peakSpeedBuffer[0]                        
-                        let currentDuration = location.timestamp.timeIntervalSince(last.timestamp)
-                        let currentDistance = location.distance(from: last)
-                        self.currentSpeed = currentDistance / currentDuration
-                        if self.currentSpeed > self.peakSpeed {
-                            self.peakSpeed = self.currentSpeed
+                        
+                        // If any individual hop in the buffer is faster than
+                        // an olypian 100m sprint, disregard the entire buffer, as
+                        // the GPS jumps are ruinous
+                        var possible = true
+                        for i in 1..<peakSpeedBufferSize {
+                            let duration = peakSpeedBuffer[i].timestamp.timeIntervalSince(peakSpeedBuffer[i-1].timestamp)
+                            let distance = peakSpeedBuffer[i].distance(from: peakSpeedBuffer[i-1])
+                            let speed = distance / duration
+                            if speed > 10.0 {
+                                possible = false
+                                break
+                            }
+                        }
+                        
+                        if possible {
+                            let last = peakSpeedBuffer[0]
+                            let currentDuration = location.timestamp.timeIntervalSince(last.timestamp)
+                            let currentDistance = location.distance(from: last)
+                            self.currentSpeed = currentDistance / currentDuration
+                            if self.currentSpeed > self.peakSpeed {
+                                self.peakSpeed = self.currentSpeed
+                            }
                         }
                     }
                 }
