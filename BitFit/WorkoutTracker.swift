@@ -448,6 +448,9 @@ extension WorkoutTracker: CLLocationManagerDelegate {
                 filteredLocations = remaining
             }
             
+            let oldFiltered = filteredLocations
+            filteredLocations = oldFiltered.filter() { return $0.horizontalAccuracy <= 10.0 }
+
             if state == .Started {
                 guard let builder = routeBuilder else {
                     return
@@ -500,7 +503,7 @@ extension WorkoutTracker: CLLocationManagerDelegate {
                     }
                 }
                 
-                builder.insertRouteData(locations) { (success, error) in
+                builder.insertRouteData(filteredLocations) { (success, error) in
                     if let err = error {
                         print("Failed to insert data! \(err)")
                     } else if !success {
