@@ -22,6 +22,8 @@ extension HKWorkoutActivityType {
             return "Walking"
         case .cycling:
             return "Cycling"
+        case .skatingSports:
+            return "Skating"
         case .wheelchairRunPace:
             return "Wheelchair, fast pace"
         case .wheelchairWalkPace:

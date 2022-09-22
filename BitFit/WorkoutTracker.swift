@@ -38,6 +38,8 @@ extension HKWorkoutActivityType {
             return "wheelchairRunPace"
         case .wheelchairWalkPace:
             return "wheelchairWalkPace"
+        case .skatingSports:
+            return "skatingSports"
         default:
             return "unknownWorkoutActivityType"
         }
@@ -49,7 +51,7 @@ extension HKWorkoutActivityType {
             return HKObjectType.quantityType(forIdentifier: .distanceDownhillSnowSports)!
         case .cycling:
             return HKObjectType.quantityType(forIdentifier: .distanceCycling)!
-        case .running, .walking, .crossCountrySkiing, .golf:
+        case .running, .walking, .crossCountrySkiing, .golf, .skatingSports:
             return HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!
         case .wheelchairWalkPace, .wheelchairRunPace:
             return HKObjectType.quantityType(forIdentifier: .distanceWheelchair)!
@@ -103,7 +105,8 @@ class WorkoutTracker: NSObject {
                                                              .wheelchairWalkPace,
                                                              .running,
                                                              .wheelchairRunPace,
-                                                             .cycling]
+                                                             .cycling,
+                                                             .skatingSports]
     
     let peakSpeedBufferSize = 5
     
