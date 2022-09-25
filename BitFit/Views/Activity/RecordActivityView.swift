@@ -25,19 +25,24 @@ struct RecordActivityView: View {
         VStack {
             switch workoutStateMachine.currentState {
             case .Before:
-                NewActivityView(workoutStateMachine: workoutStateMachine)
+                NewActivityView()
+                    .environmentObject(workoutStateMachine)
             case .WaitingForGPSAccuracy:
-                WaitingForGPS(workoutStateMachine: workoutStateMachine)
+                WaitingForGPS()
+                    .environmentObject(workoutStateMachine)
             case .WaitingForGPSToStart:
-                WaitingForGPS(workoutStateMachine: workoutStateMachine)
+                WaitingForGPS()
+                    .environmentObject(workoutStateMachine)
             case .Paused:
                 Text("Paused") // TODO: currently unsupported
             case .Started:
-                ActiveActivityView(workoutStateMachine: workoutStateMachine)
+                ActiveActivityView()
+                    .environmentObject(workoutStateMachine)
             case .Failed:
                 FailedActivityView() // TODO: one day .Failed will contain the error
             case .Stopped:
-                PostActivityView(workoutStateMachine: workoutStateMachine)
+                PostActivityView()
+                    .environmentObject(workoutStateMachine)
             }
         }
         .onAppear() {

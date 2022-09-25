@@ -14,8 +14,7 @@ struct NewActivityView: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var locationManager: AnyLocationModel
     @EnvironmentObject var healthManager: AnyHealthModel
-
-    let workoutStateMachine: WorkoutStateMachine
+    @EnvironmentObject var workoutStateMachine: WorkoutStateMachine
 
     let supportedWorkouts: [HKWorkoutActivityType] = [
         .walking,
@@ -38,6 +37,7 @@ struct NewActivityView: View {
             }
             if let activity = HKWorkoutActivityType(rawValue: UInt(selectedActivityInt)) {
                 Button {
+                    // TODO: are you sure?
                     workoutStateMachine.start(
                         activity: activity,
                         locationManager: locationManager,
@@ -59,6 +59,7 @@ struct NewActivityView: View {
 
 struct NewActivityView_Previews: PreviewProvider {
     static var previews: some View {
-        NewActivityView(workoutStateMachine: WorkoutStateMachine())
+        NewActivityView()
+            .environmentObject(WorkoutStateMachine())
     }
 }

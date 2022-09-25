@@ -9,8 +9,7 @@
 import SwiftUI
 
 struct WaitingForGPS: View {
-
-    var workoutStateMachine: WorkoutStateMachine
+    @EnvironmentObject var workoutStateMachine: WorkoutStateMachine
 
     var body: some View {
         VStack {
@@ -27,6 +26,7 @@ struct WaitingForGPS: View {
 
 struct WaitingForGPS_Previews: PreviewProvider {
     static var previews: some View {
-        WaitingForGPS(workoutStateMachine: WorkoutStateMachine())
+        WaitingForGPS()
+            .environmentObject(WorkoutStateMachine())
     }
 }

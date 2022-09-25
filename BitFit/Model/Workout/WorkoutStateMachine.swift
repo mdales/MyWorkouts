@@ -95,21 +95,29 @@ final class WorkoutStateMachine: ObservableObject {
         case Failed // TODO: This should contain the error, but that breaks equitable
     }
 
-    let peakSpeedBufferSize = 5
+    static let supportedWorkouts: [HKWorkoutActivityType] = [.walking,
+                                                             .wheelchairWalkPace,
+                                                             .running,
+                                                             .wheelchairRunPace,
+                                                             .cycling,
+                                                             .skatingSports]
+
+    private let peakSpeedBufferSize = 5
 
     @Published private(set) var currentState: WorkoutState = .Before
     @Published private(set) var activityType: HKWorkoutActivityType = .walking
     @Published private(set) var splits: [WorkoutSplit] = []
+    @Published private(set) var distance: CLLocationDistance = 0.0
 
-    let syncQ = DispatchQueue(label: "workout")
-    var workoutBuilder: HKWorkoutBuilder?
-    var routeBuilder: HKWorkoutRouteBuilder?
-    var peakSpeedBuffer = [CLLocation]()
-    var peakSpeed = 0.0
-    var currentSpeed = 0.0
-    let splitDistance: Double = 100.0
-    var lastLocation: CLLocation?
-    private var distance: CLLocationDistance = 0.0
+    private let syncQ = DispatchQueue(label: "workout")
+    private var workoutBuilder: HKWorkoutBuilder?
+    private var routeBuilder: HKWorkoutRouteBuilder?
+    private var peakSpeedBuffer = [CLLocation]()
+    private var peakSpeed = 0.0
+    private var currentSpeed = 0.0
+    private var lastLocation: CLLocation?
+
+    private let splitDistance: Double
 
     // Ideally this would be a constant set in the constructor, but because this
     // is a StateObject, I can't pass any args to the constructor, so the best we can
@@ -119,6 +127,9 @@ final class WorkoutStateMachine: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
 
+    init() {
+        self.splitDistance = WorkoutStateMachine.getDistanceUnitSetting() == .Miles ? 1609.34 : 1000.0
+    }
 
     func start(
         activity: HKWorkoutActivityType,
@@ -142,7 +153,6 @@ final class WorkoutStateMachine: ObservableObject {
             assert(workoutBuilder == nil)
             assert(routeBuilder == nil)
 
-            self.distance = 0.0
 
             let config = HKWorkoutConfiguration()
             config.activityType = activityType
@@ -159,6 +169,7 @@ final class WorkoutStateMachine: ObservableObject {
             // main therad
             self.currentState = .WaitingForGPSToStart
             self.splits.removeAll()
+            self.distance = 0.0
         }
 
         locationManager.latestLocationsPublisher
@@ -309,6 +320,7 @@ final class WorkoutStateMachine: ObservableObject {
 
         var nextState = currentState
         var newSplits: [WorkoutSplit] = []
+        var newDistance = distance
         var filteredLocations = locations
 
         if currentState == .WaitingForGPSAccuracy || currentState == .WaitingForGPSToStart {
@@ -380,11 +392,11 @@ final class WorkoutStateMachine: ObservableObject {
 
             for location in filteredLocations {
                 if let last = lastLocation {
-                    let newDistance = location.distance(from: last)
-                    distance += newDistance
+                    let distanceUpdate = location.distance(from: last)
+                    newDistance += distanceUpdate
 
-                    if distance > (self.splitDistance * Double(self.splits.count)) {
-                        newSplits.append(WorkoutSplit(time: location.timestamp, distance: distance))
+                    if newDistance > (self.splitDistance * Double(self.splits.count)) {
+                        newSplits.append(WorkoutSplit(time: location.timestamp, distance: newDistance))
                     }
                 }
                 lastLocation = location
@@ -421,22 +433,38 @@ final class WorkoutStateMachine: ObservableObject {
                 }
             }
 
-            builder.insertRouteData(filteredLocations) { (success, error) in
-                if let err = error {
-                    print("Failed to insert data! \(err)")
-                } else if !success {
-                    print("Failed to insert data")
+            if filteredLocations.count > 0 {
+                builder.insertRouteData(filteredLocations) { (success, error) in
+                    if let err = error {
+                        print("Failed to insert data! \(err)")
+                    } else if !success {
+                        print("Failed to insert data")
+                    }
                 }
             }
         }
 
         DispatchQueue.main.sync {
             if nextState != currentState {
-                currentState = nextState
+                self.currentState = nextState
             }
-            if newSplits.count > 1 {
+            if newSplits.count > 0 {
                 self.splits += newSplits
             }
+            if newDistance != distance {
+                self.distance = newDistance
+            }
         }
+    }
+}
+
+extension WorkoutStateMachine {
+    static func getDistanceUnitSetting() -> DistanceUnit {
+        if let distanceUnits = UserDefaults.standard.string(forKey: SettingsNames.DistanceUnits.rawValue) {
+            if let newUnits = DistanceUnit(rawValue: distanceUnits) {
+                return newUnits
+            }
+        }
+        return .Miles
     }
 }

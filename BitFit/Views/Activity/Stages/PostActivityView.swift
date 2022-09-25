@@ -11,8 +11,7 @@ import SwiftUI
 struct PostActivityView: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject private var healthManager: AnyHealthModel
-
-    var workoutStateMachine: WorkoutStateMachine
+    @EnvironmentObject var workoutStateMachine: WorkoutStateMachine
 
     var body: some View {
         VStack {
@@ -26,7 +25,7 @@ struct PostActivityView: View {
             .buttonStyle(ActionButtonStyle())
             if let firstSplit = workoutStateMachine.splits.first {
                 ScrollView {
-                    ForEach(workoutStateMachine.splits, id: \.self) { split in
+                    ForEach(workoutStateMachine.splits[1...].reversed(), id: \.self) { split in
                         SplitCellView(split: split, startTime: firstSplit.time)
                     }
                 }
@@ -37,6 +36,7 @@ struct PostActivityView: View {
 
 struct PostActivityView_Previews: PreviewProvider {
     static var previews: some View {
-        PostActivityView(workoutStateMachine: WorkoutStateMachine())
+        PostActivityView()
+            .environmentObject(WorkoutStateMachine())
     }
 }

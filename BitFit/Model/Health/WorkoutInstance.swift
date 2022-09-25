@@ -98,8 +98,8 @@ final class WorkoutInstance: ObservableObject {
                 newAnnotations.append(RouteAnnotation(position: .start, coordinate: locations[0].coordinate))
             }
 
-            let splitDistance = WorkoutTracker.getDistanceUnitSetting() == .Miles ? 1609.34 : 1000.0
-            let units = WorkoutTracker.getDistanceUnitSetting() == .Miles ? "m" : "km"
+            let splitDistance = WorkoutStateMachine.getDistanceUnitSetting() == .Miles ? 1609.34 : 1000.0
+            let units = WorkoutStateMachine.getDistanceUnitSetting() == .Miles ? "m" : "km"
             for loc in locations {
                 if let last = last_loc {
                     let delta = loc.distance(from: last)
@@ -162,7 +162,7 @@ final class WorkoutInstance: ObservableObject {
         guard let distanceQuantity = distanceStatistic.sumQuantity() else {
             return nil
         }
-        let units = WorkoutTracker.getDistanceUnitSetting()
+        let units = WorkoutStateMachine.getDistanceUnitSetting()
         switch units {
         case .Miles:
             return distanceQuantity.doubleValue(for: .mile())

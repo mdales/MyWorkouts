@@ -9,7 +9,8 @@
 import SwiftUI
 
 struct ActiveActivityView: View {
-    var workoutStateMachine: WorkoutStateMachine
+    @EnvironmentObject var workoutStateMachine: WorkoutStateMachine
+
     var body: some View {
         VStack {
             Image(workoutStateMachine.activityType.String())
@@ -21,11 +22,22 @@ struct ActiveActivityView: View {
             }
             .buttonStyle(ActionButtonStyle())
             if let firstSplit = workoutStateMachine.splits.first {
-                ScrollView {
-                    ForEach(workoutStateMachine.splits, id: \.self) { split in
-                        SplitCellView(split: split, startTime: firstSplit.time)
+//                ScrollView {
+                    List {
+                        SplitCellView(
+                            split: WorkoutSplit(
+                                time: Date(),
+                                distance: workoutStateMachine.distance
+                            ),
+                            startTime: firstSplit.time
+                        )
+                        ForEach(workoutStateMachine.splits[1...].reversed(), id: \.self) { split in
+                            SplitCellView(split: split, startTime: firstSplit.time)
+                        }
                     }
-                }
+//                }
+            } else {
+                Text("Missing first split!")
             }
             Spacer()
         }
@@ -35,6 +47,7 @@ struct ActiveActivityView: View {
 struct ActiveActivityView_Previews: PreviewProvider {
     static let wsm = WorkoutStateMachine()
     static var previews: some View {
-        ActiveActivityView(workoutStateMachine: wsm)
+        ActiveActivityView()
+            .environmentObject(wsm)
     }
 }

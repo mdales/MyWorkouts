@@ -118,7 +118,7 @@ class HealthModel: ObservableObject, AbstractHealthModel {
 
     func requestPermission() {
         var healthKitTypes: Set<HKSampleType> = [HKObjectType.workoutType(), HKSeriesType.workoutRoute()]
-        for activityType in WorkoutTracker.supportedWorkouts {
+        for activityType in WorkoutStateMachine.supportedWorkouts {
             let distanceType = activityType.DistanceType()
             healthKitTypes.insert(distanceType)
         }
