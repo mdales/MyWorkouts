@@ -13,27 +13,6 @@ import AVKit
 import os.log
 import UPCarouselFlowLayout
 
-extension HKWorkoutActivityType {
-    func DisplayString() -> String {
-        switch self {
-        case .running:
-            return "Running"
-        case .walking:
-            return "Walking"
-        case .cycling:
-            return "Cycling"
-        case .skatingSports:
-            return "Skating"
-        case .wheelchairRunPace:
-            return "Wheelchair, fast pace"
-        case .wheelchairWalkPace:
-            return "Wheelchair, medium pace"
-        default:
-            return "Unknown activity"
-        }
-    }
-}
-
 class RecordWorkoutViewController: UIViewController {
 
     @IBOutlet weak var activityCollectionView: UICollectionView!
@@ -216,7 +195,7 @@ class RecordWorkoutViewController: UIViewController {
         if let workoutTracker = self.workoutTracker {
             workoutState = workoutTracker.state
         }
-        if ![WorkoutState.WaitingForGPS, WorkoutState.WaitingForLocationStream].contains(workoutState) {
+        if ![WorkoutState.WaitingForGPSAccuracy, WorkoutState.WaitingForGPSToStart].contains(workoutState) {
             return
         }
         
@@ -243,7 +222,7 @@ class RecordWorkoutViewController: UIViewController {
         
         // set the active activity image
         switch workoutState {
-        case .WaitingForLocationStream, .WaitingForGPS:
+        case .WaitingForGPSToStart, .WaitingForGPSAccuracy:
             lockedActivityImageView.image = UIImage(named: "noGPS")
             animateGPS()
         default:
@@ -256,7 +235,7 @@ class RecordWorkoutViewController: UIViewController {
         switch workoutState {
         case .Before, .Stopped, .Failed:
             self.toggleButton.setTitle("Start", for: .normal)
-        case .WaitingForGPS, .WaitingForLocationStream:
+        case .WaitingForGPSAccuracy, .WaitingForGPSToStart:
             self.toggleButton.setTitle("Cancel", for: .normal)
         default:
             self.toggleButton.setTitle("Stop", for: .normal)
@@ -274,7 +253,7 @@ class RecordWorkoutViewController: UIViewController {
         
         // set activity text
         switch workoutState {
-        case .WaitingForGPS, .WaitingForLocationStream:
+        case .WaitingForGPSAccuracy, .WaitingForGPSToStart:
             self.activityLabel.text = "Waiting for GPS..."
         default:
             self.activityLabel.text = "Activity: \(activityType.DisplayString())"
@@ -323,9 +302,9 @@ extension RecordWorkoutViewController: WorkoutTrackerDelegate {
             }
             
             var phrase = ""
-            let announceDistance = UserDefaults.standard.bool(forKey: SettingsNames.DistanceAnnoucement.rawValue)
-            let announceTime = UserDefaults.standard.bool(forKey: SettingsNames.TimeAnnouncement.rawValue)
-            let announcePace = UserDefaults.standard.bool(forKey: SettingsNames.PaceAnnouncement.rawValue)
+            let announceDistance = UserDefaults.standard.bool(forKey: SettingsNames.AnnounceDistance.rawValue)
+            let announceTime = UserDefaults.standard.bool(forKey: SettingsNames.AnnounceTime.rawValue)
+            let announcePace = UserDefaults.standard.bool(forKey: SettingsNames.AnnouncePace.rawValue)
             
             let latestSplit = latestSplits[latestSplits.count - 1]
             let priorSplit = latestSplits[finalUpdate ? 0 : latestSplits.count - 2]

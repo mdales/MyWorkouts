@@ -8,19 +8,19 @@
 
 import UIKit
 
-enum SettingsNames: String {
-    case DistanceUnits
-    case DistanceAnnoucement
-    case TimeAnnouncement
-    case PaceAnnouncement
-}
-
+//enum SettingsNames: String {
+//    case DistanceUnits
+//    case AnnounceDistance
+//    case AnnounceTime
+//    case AnnouncePace
+//}
+//
 func DefaultSettings() -> [String:Any] {
     return [
         SettingsNames.DistanceUnits.rawValue: DistanceUnit.Miles.rawValue,
-        SettingsNames.DistanceAnnoucement.rawValue: true,
-        SettingsNames.TimeAnnouncement.rawValue: true,
-        SettingsNames.PaceAnnouncement.rawValue: true
+        SettingsNames.AnnounceDistance.rawValue: true,
+        SettingsNames.AnnounceTime.rawValue: true,
+        SettingsNames.AnnouncePace.rawValue: true
     ]
 }
 
@@ -28,8 +28,8 @@ class SettingsTableViewController: UITableViewController {
     
     @IBOutlet weak var distanceUnitsLabel: UILabel!
     @IBOutlet weak var distanceAnnouncementsSwitch: UISwitch!
-    @IBOutlet weak var timeAnnouncementsSwitch: UISwitch!
-    @IBOutlet weak var paceAnnouncementsSwitch: UISwitch!
+    @IBOutlet weak var AnnounceTimesSwitch: UISwitch!
+    @IBOutlet weak var AnnouncePacesSwitch: UISwitch!
     @IBOutlet weak var versionLabel: UILabel!
     
     override func viewDidLoad() {
@@ -54,14 +54,14 @@ class SettingsTableViewController: UITableViewController {
         }
         distanceUnitsLabel.text = distanceUnits.rawValue
         
-        let distAnnounce = defaults.bool(forKey: SettingsNames.DistanceAnnoucement.rawValue)
+        let distAnnounce = defaults.bool(forKey: SettingsNames.AnnounceDistance.rawValue)
         distanceAnnouncementsSwitch.isOn = distAnnounce
         
-        let timeAnnounce =  defaults.bool(forKey: SettingsNames.DistanceAnnoucement.rawValue)
-        timeAnnouncementsSwitch.isOn = timeAnnounce
+        let timeAnnounce =  defaults.bool(forKey: SettingsNames.AnnounceDistance.rawValue)
+        AnnounceTimesSwitch.isOn = timeAnnounce
         
-        let paceAnnounce = defaults.bool(forKey: SettingsNames.DistanceAnnoucement.rawValue)
-        paceAnnouncementsSwitch.isOn = paceAnnounce
+        let paceAnnounce = defaults.bool(forKey: SettingsNames.AnnounceDistance.rawValue)
+        AnnouncePacesSwitch.isOn = paceAnnounce
         
         if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
             versionLabel.text = version
@@ -70,17 +70,17 @@ class SettingsTableViewController: UITableViewController {
 
     @IBAction func distanceAnnouncementToggled(_ sender: Any) {
         let newVal = distanceAnnouncementsSwitch.isOn
-        UserDefaults.standard.set(newVal, forKey: SettingsNames.DistanceAnnoucement.rawValue)
+        UserDefaults.standard.set(newVal, forKey: SettingsNames.AnnounceDistance.rawValue)
     }
     
-    @IBAction func timeAnnouncementToggled(_ sender: Any) {
-        let newVal = timeAnnouncementsSwitch.isOn
-        UserDefaults.standard.set(newVal, forKey: SettingsNames.TimeAnnouncement.rawValue)
+    @IBAction func AnnounceTimeToggled(_ sender: Any) {
+        let newVal = AnnounceTimesSwitch.isOn
+        UserDefaults.standard.set(newVal, forKey: SettingsNames.AnnounceTime.rawValue)
     }
     
-    @IBAction func paceAnnouncementToggled(_ sender: Any) {
-        let newVal = paceAnnouncementsSwitch.isOn
-        UserDefaults.standard.set(newVal, forKey: SettingsNames.PaceAnnouncement.rawValue)
+    @IBAction func AnnouncePaceToggled(_ sender: Any) {
+        let newVal = AnnouncePacesSwitch.isOn
+        UserDefaults.standard.set(newVal, forKey: SettingsNames.AnnouncePace.rawValue)
     }
     
     

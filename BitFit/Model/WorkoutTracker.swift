@@ -10,55 +10,14 @@ import Foundation
 import HealthKit
 import CoreLocation
 
-enum DistanceUnit: String, CaseIterable {
-    case Miles
-    case Kilometers
-}
-
 enum WorkoutState {
     case Before
-    case WaitingForLocationStream
-    case WaitingForGPS
+    case WaitingForGPSToStart
+    case WaitingForGPSAccuracy
     case Started
     case Paused // not yet implemented
     case Stopped
     case Failed
-}
-
-extension HKWorkoutActivityType {
-    func String() -> String {
-        switch self {
-        case .running:
-            return "running"
-        case .walking:
-            return "walking"
-        case .cycling:
-            return "cycling"
-        case .wheelchairRunPace:
-            return "wheelchairRunPace"
-        case .wheelchairWalkPace:
-            return "wheelchairWalkPace"
-        case .skatingSports:
-            return "skatingSports"
-        default:
-            return "unknownWorkoutActivityType"
-        }
-    }
-    
-    func DistanceType() -> HKQuantityType {
-        switch self {
-        case .downhillSkiing:
-            return HKObjectType.quantityType(forIdentifier: .distanceDownhillSnowSports)!
-        case .cycling:
-            return HKObjectType.quantityType(forIdentifier: .distanceCycling)!
-        case .running, .walking, .crossCountrySkiing, .golf, .skatingSports:
-            return HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!
-        case .wheelchairWalkPace, .wheelchairRunPace:
-            return HKObjectType.quantityType(forIdentifier: .distanceWheelchair)!
-        default:
-            fatalError()
-        }
-    }
 }
 
 enum WorkoutTrackerError: Error {
@@ -67,16 +26,6 @@ enum WorkoutTrackerError: Error {
     case NoWorkoutStarted
     case ErrorEndingCollection
     case MissingWorkout
-}
-
-struct WorkoutSplit {
-    let time: Date
-    let distance: Double
-    
-    init(time: Date, distance: Double) {
-        self.time = time
-        self.distance = distance
-    }
 }
 
 protocol WorkoutTrackerDelegate {
@@ -226,9 +175,9 @@ class WorkoutTracker: NSObject {
             workoutBuilder = builder
             
             
-            self.state = .WaitingForLocationStream
+            self.state = .WaitingForGPSToStart
             self.delegateQ.async {
-                self.delegate.stateUpdated(newState: .WaitingForLocationStream)
+                self.delegate.stateUpdated(newState: .WaitingForGPSToStart)
             }
             
             HKSeriesType.workoutRoute()
@@ -261,7 +210,7 @@ class WorkoutTracker: NSObject {
             }
             
             // XXXX if not start date we didn't get a GPS lock...
-            if state == .WaitingForLocationStream || state == .WaitingForGPS {
+            if state == .WaitingForGPSToStart || state == .WaitingForGPSAccuracy {
                 self.workoutBuilder = nil
                 routeBuilder = nil
                 state = .Stopped
@@ -378,7 +327,7 @@ extension WorkoutTracker: CLLocationManagerDelegate {
             
             var filteredLocations = locations
             
-            if state == .WaitingForGPS || state == .WaitingForLocationStream {
+            if state == .WaitingForGPSAccuracy || state == .WaitingForGPSToStart {
                 var remaining = [CLLocation]()
                 
                 for location in locations {
@@ -396,7 +345,7 @@ extension WorkoutTracker: CLLocationManagerDelegate {
                     }
                     
                     switch state {
-                    case .WaitingForGPS, .WaitingForLocationStream:
+                    case .WaitingForGPSAccuracy, .WaitingForGPSToStart:
 
                         print("speed: \(location.speed)")
                         
@@ -436,10 +385,10 @@ extension WorkoutTracker: CLLocationManagerDelegate {
                                                         
                             remaining.append(location)
                         default:
-                            if state == .WaitingForLocationStream {
-                                state = .WaitingForGPS
+                            if state == .WaitingForGPSToStart {
+                                state = .WaitingForGPSAccuracy
                                 delegateQ.async {
-                                    self.delegate.stateUpdated(newState: .WaitingForGPS)
+                                    self.delegate.stateUpdated(newState: .WaitingForGPSAccuracy)
                                 }
                             }
                             break

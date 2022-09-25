@@ -11,7 +11,7 @@ import CoreData
 import HealthKit
 import CoreLocation
 
-@UIApplicationMain
+//@UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
