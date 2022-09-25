@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct ActionButtonStyle: ButtonStyle {
-    let bgColor: Color = Color(red: 1.0, green: 45.0/255.0, blue: 85.0/255.0)
+    let bgColor: Color = Color("AccentColor")
 
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label

@@ -106,6 +106,10 @@ class LocationModel: NSObject, ObservableObject, CLLocationManagerDelegate, Abst
 
         super.init()
         locationManager.delegate = self
+
+        locationManager.activityType = .fitness
+        locationManager.allowsBackgroundLocationUpdates = true
+        locationManager.pausesLocationUpdatesAutomatically = false
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
     }
 

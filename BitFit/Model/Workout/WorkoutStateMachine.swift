@@ -383,7 +383,7 @@ final class WorkoutStateMachine: ObservableObject {
         }
 
         let oldFiltered = filteredLocations
-        filteredLocations = oldFiltered.filter() { return $0.horizontalAccuracy <= 10.0 }
+        filteredLocations = oldFiltered.filter() { $0.horizontalAccuracy <= 10.0 }
 
         if nextState == .Started {
             guard let builder = routeBuilder else {
