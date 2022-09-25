@@ -17,7 +17,6 @@ struct BitFitApp: App {
         healthModel = AnyHealthModel(mocked: ProcessInfo.processInfo.arguments.contains(kUITestingFlag))
     }
 
-
     var body: some Scene {
         WindowGroup {
             RootView()
