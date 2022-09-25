@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,6 +13,10 @@
 		4C0400D02291B4FC00E2F5FA /* BitFitUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0400CF2291B4FC00E2F5FA /* BitFitUITests.swift */; };
 		4C0400E02291B56500E2F5FA /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C0400DF2291B56500E2F5FA /* HealthKit.framework */; };
 		4C072B6F229FDC9200C9C3E7 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C072B6E229FDC9200C9C3E7 /* MapKit.framework */; };
+		4C235B9E28E0D3C8002DEFB1 /* Diligence in Frameworks */ = {isa = PBXBuildFile; productRef = 4C235B9D28E0D3C8002DEFB1 /* Diligence */; };
+		4C235BA028E0D84E002DEFB1 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C235B9F28E0D84E002DEFB1 /* AboutView.swift */; };
+		4C235BA328E0E09D002DEFB1 /* Diligence.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4C235BA228E0E09D002DEFB1 /* Diligence.txt */; };
+		4C235BA528E0E0BB002DEFB1 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4C235BA428E0E0BB002DEFB1 /* LICENSE.txt */; };
 		4C333C9A28DDAAAA00E325BB /* BitFitApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C333C9928DDAAAA00E325BB /* BitFitApp.swift */; };
 		4C333C9E28DDABC500E325BB /* WorkoutHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C333C9D28DDABC500E325BB /* WorkoutHistoryView.swift */; };
 		4C333CA428DDB27600E325BB /* LocationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C333CA328DDB27600E325BB /* LocationModel.swift */; };
@@ -93,6 +97,9 @@
 		4C072B67229E6E5A00C9C3E7 /* WorkoutDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailViewController.swift; sourceTree = "<group>"; };
 		4C072B6B229EA22900C9C3E7 /* WorkoutTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTracker.swift; sourceTree = "<group>"; };
 		4C072B6E229FDC9200C9C3E7 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		4C235B9F28E0D84E002DEFB1 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		4C235BA228E0E09D002DEFB1 /* Diligence.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Diligence.txt; sourceTree = "<group>"; };
+		4C235BA428E0E0BB002DEFB1 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		4C333C9928DDAAAA00E325BB /* BitFitApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitFitApp.swift; sourceTree = "<group>"; };
 		4C333C9D28DDABC500E325BB /* WorkoutHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutHistoryView.swift; sourceTree = "<group>"; };
 		4C333CA328DDB27600E325BB /* LocationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationModel.swift; sourceTree = "<group>"; };
@@ -130,6 +137,7 @@
 			files = (
 				4C072B6F229FDC9200C9C3E7 /* MapKit.framework in Frameworks */,
 				4C0400E02291B56500E2F5FA /* HealthKit.framework in Frameworks */,
+				4C235B9E28E0D3C8002DEFB1 /* Diligence in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -174,6 +182,7 @@
 		4C0400AB2291B4FB00E2F5FA /* BitFit */ = {
 			isa = PBXGroup;
 			children = (
+				4C235BA128E0E088002DEFB1 /* Resources */,
 				4C333C9B28DDAAB400E325BB /* App */,
 				4C333C9428DD9A8C00E325BB /* Model */,
 				4C333C9628DD9A9400E325BB /* Views */,
@@ -213,6 +222,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		4C235BA128E0E088002DEFB1 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				4C235BA228E0E09D002DEFB1 /* Diligence.txt */,
+				4C235BA428E0E0BB002DEFB1 /* LICENSE.txt */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		4C333C9428DD9A8C00E325BB /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -233,6 +251,7 @@
 				4C333C9C28DDAB9700E325BB /* Legacy */,
 				4C333CA928DDB66F00E325BB /* RootView.swift */,
 				4CAA64F328DDDF21004906B3 /* SettingsPicker.swift */,
+				4C235B9F28E0D84E002DEFB1 /* AboutView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -348,6 +367,9 @@
 			dependencies = (
 			);
 			name = MyWorkouts;
+			packageProductDependencies = (
+				4C235B9D28E0D3C8002DEFB1 /* Diligence */,
+			);
 			productName = BitFit;
 			productReference = 4C0400A92291B4FB00E2F5FA /* MyWorkouts.app */;
 			productType = "com.apple.product-type.application";
@@ -434,6 +456,9 @@
 				Base,
 			);
 			mainGroup = 4C0400A02291B4FA00E2F5FA;
+			packageReferences = (
+				4C235B9C28E0D3C8002DEFB1 /* XCRemoteSwiftPackageReference "diligence" */,
+			);
 			productRefGroup = 4C0400AA2291B4FB00E2F5FA /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -450,7 +475,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C235BA528E0E0BB002DEFB1 /* LICENSE.txt in Resources */,
 				4C0400B72291B4FC00E2F5FA /* Assets.xcassets in Resources */,
+				4C235BA328E0E09D002DEFB1 /* Diligence.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -479,6 +506,7 @@
 				4C552F1628DE3F2B003208EF /* WaitingForGPS.swift in Sources */,
 				4CAA64F028DDD8AD004906B3 /* WorkoutDetailView.swift in Sources */,
 				4C333C9E28DDABC500E325BB /* WorkoutHistoryView.swift in Sources */,
+				4C235BA028E0D84E002DEFB1 /* AboutView.swift in Sources */,
 				4C552F2328DF63EC003208EF /* InfoCell.swift in Sources */,
 				4CAA64F928DDF644004906B3 /* LocationRequiredWrapper.swift in Sources */,
 				4CAA64FF28DE0188004906B3 /* RecordActivityView.swift in Sources */,
@@ -841,6 +869,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4C235B9C28E0D3C8002DEFB1 /* XCRemoteSwiftPackageReference "diligence" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/inseven/diligence";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4C235B9D28E0D3C8002DEFB1 /* Diligence */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4C235B9C28E0D3C8002DEFB1 /* XCRemoteSwiftPackageReference "diligence" */;
+			productName = Diligence;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		4C0400B32291B4FB00E2F5FA /* BitFit.xcdatamodeld */ = {

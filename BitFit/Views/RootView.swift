@@ -10,6 +10,7 @@ import SwiftUI
 
 struct RootView: View {
     @State private var recordActivity = false
+    @State private var showAbout = false
 
     var body: some View {
         NavigationStack {
@@ -27,9 +28,11 @@ struct RootView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    SettingsPicker()
+                    SettingsPicker(showAboutSheet: $showAbout)
                 }
             }
+        }.sheet(isPresented: $showAbout) {
+            AboutView()
         }
     }
 }

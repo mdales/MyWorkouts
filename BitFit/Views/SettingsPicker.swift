@@ -21,6 +21,8 @@ struct SettingsPicker: View {
     @AppStorage(SettingsNames.AnnounceTime.rawValue) private var AnnounceTime: Bool = true
     @AppStorage(SettingsNames.AnnouncePace.rawValue) private var AnnouncePace: Bool = true
 
+    @Binding var showAboutSheet: Bool
+
     var body: some View {
         Menu {
             Picker(selection: $distanceUnits, label: Text("Distance units")) {
@@ -39,7 +41,14 @@ struct SettingsPicker: View {
                 Toggle(isOn: $AnnouncePace) {
                     Text("Announce pace")
                 }
+            }
 
+            Section {
+                Button {
+                    showAboutSheet.toggle()
+                } label: {
+                    Text("About…")
+                }
             }
         } label: {
             Image(systemName:  "ellipsis.circle")
@@ -49,7 +58,8 @@ struct SettingsPicker: View {
 }
 
 struct SettingsPicker_Previews: PreviewProvider {
+    @State static var showAboutSheet: Bool = false
     static var previews: some View {
-        SettingsPicker()
+        SettingsPicker(showAboutSheet: $showAboutSheet)
     }
 }
