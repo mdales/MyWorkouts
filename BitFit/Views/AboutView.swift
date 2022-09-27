@@ -19,7 +19,7 @@ struct AboutView: View {
                     ApplicationNameTitle()
                 }
                 Section {
-                    Link("Digital Flapjack Ltd", url: URL(string: "https://inseven.co.uk")!)
+                    Link("Digital Flapjack Ltd", url: URL(string: "https://digitalflapjack.com/")!)
                     Link("GitHub", url: URL(string: "https://github.com/mdales/myworkouts")!)
                 }
                 CreditSection("Developers", [
@@ -34,6 +34,11 @@ struct AboutView: View {
                         name: "Diligence",
                         author: "InSeven Limited",
                         filename: "Diligence.txt"
+                    ),
+                    License(
+                        name: "Map",
+                        author: "Paul Kraft",
+                        filename: "Map.txt"
                     ),
                     License(
                         name: "MyWorkouts",

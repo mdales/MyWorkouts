@@ -48,7 +48,7 @@ struct WorkoutDetailView: View {
                 title: "Peak speed",
                 value: ""
             )
-            EmbeddedMapView(workout: workout)
+            RouteMap(workout: workout)
         }.navigationTitle(workout.title)
     }
 }
@@ -61,10 +61,3 @@ struct WorkoutDetailView_Previews: PreviewProvider {
         ))
     }
 }
-
-// date
-// duration
-// distance
-// avg speed
-// peak speed
-// map

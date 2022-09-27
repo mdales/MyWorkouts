@@ -33,7 +33,6 @@
 		4C552F1928DE45AF003208EF /* ActiveActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C552F1828DE45AF003208EF /* ActiveActivityView.swift */; };
 		4C552F1B28DE46CC003208EF /* SplitCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C552F1A28DE46CC003208EF /* SplitCellView.swift */; };
 		4C552F1F28DEF572003208EF /* PostActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C552F1E28DEF572003208EF /* PostActivityView.swift */; };
-		4C552F2128DF3622003208EF /* EmbeddedMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C552F2028DF3622003208EF /* EmbeddedMapView.swift */; };
 		4C552F2328DF63EC003208EF /* InfoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C552F2228DF63EC003208EF /* InfoCell.swift */; };
 		4C552F2528E0388F003208EF /* ActionButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C552F2428E0388F003208EF /* ActionButtonStyle.swift */; };
 		4C552F2728E043B4003208EF /* SpeachManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C552F2628E043B4003208EF /* SpeachManager.swift */; };
@@ -46,6 +45,9 @@
 		4CAA64FD28DDF67E004906B3 /* RequestLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CAA64FC28DDF67E004906B3 /* RequestLocationView.swift */; };
 		4CAA64FF28DE0188004906B3 /* RecordActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CAA64FE28DE0188004906B3 /* RecordActivityView.swift */; };
 		4CAA650228DE0201004906B3 /* WorkoutStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CAA650128DE0201004906B3 /* WorkoutStateMachine.swift */; };
+		4CB392B828E1BF3600C26D01 /* Map in Frameworks */ = {isa = PBXBuildFile; productRef = 4CB392B728E1BF3600C26D01 /* Map */; };
+		4CB392BA28E1BF5700C26D01 /* Map.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4CB392B928E1BF5700C26D01 /* Map.txt */; };
+		4CB392BC28E1BFDB00C26D01 /* RouteMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CB392BB28E1BFDB00C26D01 /* RouteMap.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -111,7 +113,6 @@
 		4C552F1828DE45AF003208EF /* ActiveActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveActivityView.swift; sourceTree = "<group>"; };
 		4C552F1A28DE46CC003208EF /* SplitCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitCellView.swift; sourceTree = "<group>"; };
 		4C552F1E28DEF572003208EF /* PostActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostActivityView.swift; sourceTree = "<group>"; };
-		4C552F2028DF3622003208EF /* EmbeddedMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedMapView.swift; sourceTree = "<group>"; };
 		4C552F2228DF63EC003208EF /* InfoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoCell.swift; sourceTree = "<group>"; };
 		4C552F2428E0388F003208EF /* ActionButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionButtonStyle.swift; sourceTree = "<group>"; };
 		4C552F2628E043B4003208EF /* SpeachManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeachManager.swift; sourceTree = "<group>"; };
@@ -128,6 +129,8 @@
 		4CAA650128DE0201004906B3 /* WorkoutStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutStateMachine.swift; sourceTree = "<group>"; };
 		4CADF11E22A67DC800AA31AA /* SettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
 		4CADF12022A6883A00AA31AA /* DistanceEnumTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceEnumTableViewController.swift; sourceTree = "<group>"; };
+		4CB392B928E1BF5700C26D01 /* Map.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Map.txt; sourceTree = "<group>"; };
+		4CB392BB28E1BFDB00C26D01 /* RouteMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteMap.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,6 +139,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4C072B6F229FDC9200C9C3E7 /* MapKit.framework in Frameworks */,
+				4CB392B828E1BF3600C26D01 /* Map in Frameworks */,
 				4C0400E02291B56500E2F5FA /* HealthKit.framework in Frameworks */,
 				4C235B9E28E0D3C8002DEFB1 /* Diligence in Frameworks */,
 			);
@@ -227,6 +231,7 @@
 			children = (
 				4C235BA228E0E09D002DEFB1 /* Diligence.txt */,
 				4C235BA428E0E0BB002DEFB1 /* LICENSE.txt */,
+				4CB392B928E1BF5700C26D01 /* Map.txt */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -303,8 +308,8 @@
 				4C333C9D28DDABC500E325BB /* WorkoutHistoryView.swift */,
 				4C333CB028DDC31100E325BB /* WorkoutHistoryItem.swift */,
 				4CAA64EF28DDD8AD004906B3 /* WorkoutDetailView.swift */,
-				4C552F2028DF3622003208EF /* EmbeddedMapView.swift */,
 				4C552F2228DF63EC003208EF /* InfoCell.swift */,
+				4CB392BB28E1BFDB00C26D01 /* RouteMap.swift */,
 			);
 			path = History;
 			sourceTree = "<group>";
@@ -369,6 +374,7 @@
 			name = MyWorkouts;
 			packageProductDependencies = (
 				4C235B9D28E0D3C8002DEFB1 /* Diligence */,
+				4CB392B728E1BF3600C26D01 /* Map */,
 			);
 			productName = BitFit;
 			productReference = 4C0400A92291B4FB00E2F5FA /* MyWorkouts.app */;
@@ -458,6 +464,7 @@
 			mainGroup = 4C0400A02291B4FA00E2F5FA;
 			packageReferences = (
 				4C235B9C28E0D3C8002DEFB1 /* XCRemoteSwiftPackageReference "diligence" */,
+				4CB392B628E1BF3600C26D01 /* XCRemoteSwiftPackageReference "Map" */,
 			);
 			productRefGroup = 4C0400AA2291B4FB00E2F5FA /* Products */;
 			projectDirPath = "";
@@ -478,6 +485,7 @@
 				4C235BA528E0E0BB002DEFB1 /* LICENSE.txt in Resources */,
 				4C0400B72291B4FC00E2F5FA /* Assets.xcassets in Resources */,
 				4C235BA328E0E09D002DEFB1 /* Diligence.txt in Resources */,
+				4CB392BA28E1BF5700C26D01 /* Map.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -504,6 +512,7 @@
 			files = (
 				4C552F2728E043B4003208EF /* SpeachManager.swift in Sources */,
 				4C552F1628DE3F2B003208EF /* WaitingForGPS.swift in Sources */,
+				4CB392BC28E1BFDB00C26D01 /* RouteMap.swift in Sources */,
 				4CAA64F028DDD8AD004906B3 /* WorkoutDetailView.swift in Sources */,
 				4C333C9E28DDABC500E325BB /* WorkoutHistoryView.swift in Sources */,
 				4C235BA028E0D84E002DEFB1 /* AboutView.swift in Sources */,
@@ -522,7 +531,6 @@
 				4C333CB128DDC31100E325BB /* WorkoutHistoryItem.swift in Sources */,
 				4C333CAA28DDB66F00E325BB /* RootView.swift in Sources */,
 				4C333C9A28DDAAAA00E325BB /* BitFitApp.swift in Sources */,
-				4C552F2128DF3622003208EF /* EmbeddedMapView.swift in Sources */,
 				4C552F1B28DE46CC003208EF /* SplitCellView.swift in Sources */,
 				4C333CA428DDB27600E325BB /* LocationModel.swift in Sources */,
 				4CAA64F428DDDF21004906B3 /* SettingsPicker.swift in Sources */,
@@ -879,6 +887,14 @@
 				kind = branch;
 			};
 		};
+		4CB392B628E1BF3600C26D01 /* XCRemoteSwiftPackageReference "Map" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pauljohanneskraft/Map";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -886,6 +902,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4C235B9C28E0D3C8002DEFB1 /* XCRemoteSwiftPackageReference "diligence" */;
 			productName = Diligence;
+		};
+		4CB392B728E1BF3600C26D01 /* Map */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4CB392B628E1BF3600C26D01 /* XCRemoteSwiftPackageReference "Map" */;
+			productName = Map;
 		};
 /* End XCSwiftPackageProductDependency section */
 

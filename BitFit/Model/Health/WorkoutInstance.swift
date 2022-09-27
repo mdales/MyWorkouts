@@ -24,10 +24,12 @@ final class RouteAnnotation: Identifiable {
 
     let position: Position
     let coordinate: CLLocationCoordinate2D
+    let when: Date
 
-    init(position: Position, coordinate: CLLocationCoordinate2D) {
+    init(position: Position, coordinate: CLLocationCoordinate2D, when: Date) {
         self.position = position
         self.coordinate = coordinate
+        self.when = when
     }
 }
 
@@ -36,6 +38,24 @@ final class WorkoutInstance: ObservableObject {
 
     @Published private(set) var routePoints: [RouteAnnotation] = []
     @Published private(set) var region = MKCoordinateRegion()
+
+    var polyline: MKPolyline {
+        let subpoints = self.routePoints
+            .filter {
+                switch $0.position {
+                case .point:
+                    return true
+                default:
+                    return false
+                }
+            }
+            .sorted { $0.when < $1.when }
+            .map { $0.coordinate }
+        return MKPolyline(
+            coordinates: subpoints,
+            count: subpoints.count
+        )
+    }
 
     init(workout: HKWorkout, healthManager: AbstractHealthModel) {
         self.workout = workout
@@ -95,7 +115,7 @@ final class WorkoutInstance: ObservableObject {
 
             // is this the first batch, in which case add a start
             if self.routePoints.count == 0 {
-                newAnnotations.append(RouteAnnotation(position: .start, coordinate: locations[0].coordinate))
+                newAnnotations.append(RouteAnnotation(position: .start, coordinate: locations[0].coordinate, when: locations[0].timestamp))
             }
 
             let splitDistance = WorkoutStateMachine.getDistanceUnitSetting() == .Miles ? 1609.34 : 1000.0
@@ -108,22 +128,24 @@ final class WorkoutInstance: ObservableObject {
                     if Int(distance / splitDistance) != Int(last_disance / splitDistance) {
                         newAnnotations.append(RouteAnnotation(
                             position: .waypoint("\(Int(distance/splitDistance)) \(units)"),
-                            coordinate: loc.coordinate
+                            coordinate: loc.coordinate,
+                            when: loc.timestamp
                         ))
                     }
                 }
                 last_loc = loc
             }
 
-            newAnnotations.append(contentsOf: locations.map { RouteAnnotation(position: .point, coordinate:  $0.coordinate) })
+            newAnnotations.append(contentsOf: locations.map { RouteAnnotation(position: .point, coordinate:  $0.coordinate, when: $0.timestamp) })
 
             if done {
-                var finalLocation: CLLocationCoordinate2D? = locations.last?.coordinate
-                if finalLocation == nil {
-                    finalLocation = self.routePoints.last?.coordinate
-                }
-                if let finalLocation = finalLocation {
-                    newAnnotations.append(RouteAnnotation(position: .end, coordinate: finalLocation))
+                if let finalLocation = locations.last {
+                    newAnnotations.append(RouteAnnotation(position: .end, coordinate: finalLocation.coordinate, when: finalLocation.timestamp))
+                } else {
+                    // this done back had no data, so take most recent of last data batch (if any)
+                    if let finalAnnoation = (self.routePoints.sorted { $0.when < $1.when }.last) {
+                        newAnnotations.append(RouteAnnotation(position: .end, coordinate: finalAnnoation.coordinate, when: finalAnnoation.when))
+                    }
                 }
             }
 
@@ -132,7 +154,10 @@ final class WorkoutInstance: ObservableObject {
 
                 // TODO: do this better
                 let polyline = MKPolyline(coordinates: self.routePoints.map { $0.coordinate}, count: self.routePoints.count)
-                self.region = MKCoordinateRegion(polyline.boundingMapRect)
+                var region = MKCoordinateRegion(polyline.boundingMapRect)
+                region.span.latitudeDelta *= 1.2
+                region.span.longitudeDelta *= 1.2
+                self.region = region
             }
 
         }
